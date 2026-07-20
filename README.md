@@ -4,8 +4,11 @@ A social **foresight game** for OpenTrade — you call what the market does *bef
 
 Two things live here:
 
-1. **The game** (`/public`) — *Flashback* mode: swipe on real historical matchups ("2024: Spotify or Netflix?") and get scored instantly against real returns and against the algo.
-2. **The engine** (`/lib`, `/server.js`) — pulls **real historical prices** (Yahoo Finance, no API key) and computes **beta, alpha, volatility, return, and position P&L**. This is the "beta trading" lens: how much of a move was just the market, and how much was your call.
+1. **The Daily Deck** (`/public`) — a mix of three card types, shuffled fresh every play, that teach how the world figured out *what's valuable*:
+   - **🏛️ Past** — history-of-value trivia (why gold, the first coins, tulip mania, the first stock exchange, Nvidia's rise). Multiple choice, **real right/wrong — tells you the answer + why if you miss**.
+   - **🔴 Present** — a live call that **settles at market close** ("will NVDA close green today?"). Locks now, shows your **real-time standing**, winner is a surprise at 4pm ET.
+   - **🔮 Future** — a commodity thesis where you **name a specific company** ("electricity gets cheaper by 2030 → who wins?"). We **validate the ticker live** and reveal a commonly-cited answer + reasoning. No right/wrong — it teaches the thesis.
+2. **The engine** (`/lib`, `/server.js`) — pulls **real prices** (Yahoo Finance, no API key) and computes **beta, alpha, volatility, return, position P&L**, and **live quotes**. This is the "beta trading" lens: how much of a move was just the market, and how much was your call.
 
 Zero npm dependencies. Node 18+.
 
@@ -53,9 +56,11 @@ npm test        # node --test — pure math, no network
 | Endpoint | What it returns |
 |---|---|
 | `GET /api/health` | `{ ok, source }` |
+| `GET /api/live?tickers=A,B` | current price, previous close, today's % move, name, validity (powers present calls + future ticker checks) |
 | `GET /api/analyze?tickers=A,B&benchmark=SPY&window=252` | beta, alpha, vol, return, last close per ticker |
 | `GET /api/range?ticker=A&from=YYYY-MM-DD&to=YYYY-MM-DD` | total return between two dates |
 | `GET /api/position?ticker=A&amount=100&from=YYYY-MM-DD` | shares, value, P&L, return, beta |
+| `GET /api/matchups?count=5` | random past matchups with real returns |
 
 ## Data & caveats
 

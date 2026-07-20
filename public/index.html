@@ -9,13 +9,15 @@
     --bg:#E9E7F1;--bg-2:#E1DEEC;--surface:#FFFFFF;--surface-2:#F4F2FA;--line:#E4E1EE;
     --ink:#17141F;--muted:#6C6579;--faint:#9E98AD;
     --you:#FF6A2B;--you-soft:#FFEDE2;--algo:#5B6CF0;--algo-soft:#E9EBFF;
+    --gold:#C79A2E;--gold-soft:#F7EFD6;
     --win:#12B886;--win-soft:#E4F7EF;--lose:#F03E5A;--lose-soft:#FCE7EB;--brand:#FF6A2B;
     --shadow:0 24px 60px -20px rgba(24,18,40,.35),0 8px 20px -12px rgba(24,18,40,.25);--r:22px;
   }
   @media (prefers-color-scheme:dark){:root{
     --bg:#0C0A12;--bg-2:#141026;--surface:#191622;--surface-2:#221E30;--line:#2C2739;
     --ink:#F4F2FA;--muted:#A49CB6;--faint:#726A85;--you:#FF7C3F;--you-soft:#37220F;
-    --algo:#8593FF;--algo-soft:#1C1E3A;--win:#2BD69A;--win-soft:#0F2A22;--lose:#FF5C74;--lose-soft:#2E1620;--brand:#FF7C3F;
+    --algo:#8593FF;--algo-soft:#1C1E3A;--gold:#E4B84A;--gold-soft:#2A2312;
+    --win:#2BD69A;--win-soft:#0F2A22;--lose:#FF5C74;--lose-soft:#2E1620;--brand:#FF7C3F;
     --shadow:0 30px 70px -20px rgba(0,0,0,.7),0 10px 24px -14px rgba(0,0,0,.6);
   }}
   *{box-sizing:border-box}html,body{margin:0;padding:0}
@@ -27,7 +29,7 @@
   .up{color:var(--win)}.down{color:var(--lose)}
   .wrap{width:100%;max-width:430px;padding:22px 16px 40px;display:flex;flex-direction:column;flex:1}
   .phone{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:34px;
-    box-shadow:var(--shadow);overflow:hidden;min-height:720px;display:flex;flex-direction:column}
+    box-shadow:var(--shadow);overflow:hidden;min-height:730px;display:flex;flex-direction:column}
   header{display:flex;align-items:center;gap:10px;padding:18px 18px 6px}
   .logo{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:-.02em;font-size:18px}
   .logo .tick{width:26px;height:26px;border-radius:9px;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:15px}
@@ -44,41 +46,63 @@
   .prog{display:flex;gap:6px;padding:8px 20px 6px}
   .prog i{height:5px;flex:1;border-radius:3px;background:var(--line);transition:background .3s}
   .prog i.done{background:var(--brand)}.prog i.cur{background:var(--ink)}
-  .deck{position:relative;flex:1;margin:6px 16px 0;min-height:452px}
+  .deck{position:relative;flex:1;margin:6px 16px 0;min-height:470px}
   .card{position:absolute;inset:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
-    box-shadow:0 18px 40px -24px rgba(24,18,40,.5);display:flex;flex-direction:column;overflow:hidden;touch-action:none}
-  .kind{display:flex;align-items:center;gap:8px;padding:14px 16px 0}
-  .k{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:4px 9px;border-radius:7px;color:var(--brand);background:var(--you-soft)}
+    box-shadow:0 18px 40px -24px rgba(24,18,40,.5);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;touch-action:pan-y}
+  .kind{display:flex;align-items:center;gap:8px;padding:15px 16px 0}
+  .k{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:7px}
+  .k.past{color:var(--gold);background:var(--gold-soft)}
+  .k.present{color:var(--lose);background:var(--lose-soft)}
+  .k.future{color:var(--algo);background:var(--algo-soft)}
   .hintBtn{margin-left:auto;font-size:11px;font-weight:800;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);padding:4px 9px;border-radius:7px;cursor:pointer}
-  .card .q{padding:9px 16px 2px;font-size:19px;font-weight:800;letter-spacing:-.02em;line-height:1.22}
-  .hintbox{margin:6px 16px 0;font-size:12px;color:var(--algo);background:var(--algo-soft);border-radius:10px;padding:8px 11px;display:none}
+  .timer{font-size:11px;font-weight:700;color:var(--faint)}
+  .card .q{padding:10px 16px 4px;font-size:19px;font-weight:800;letter-spacing:-.02em;line-height:1.24}
+  .hintbox{margin:4px 16px 0;font-size:12px;color:var(--algo);background:var(--algo-soft);border-radius:10px;padding:8px 11px;display:none}
   .hintbox.show{display:block}
-  .versus{flex:1;display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;padding:8px 14px 0}
-  .side{border:2px solid var(--line);border-radius:16px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;
-    justify-content:center;gap:6px;cursor:pointer;background:var(--surface);transition:border-color .15s,background .15s,transform .1s;text-align:center}
-  .side:hover{border-color:var(--you);transform:translateY(-2px)}.side:active{transform:scale(.98)}
-  .side .name{font-size:18px;font-weight:800}.side .tkr{font-size:12px;color:var(--muted);letter-spacing:.05em}
-  .side .yr{font-size:11px;color:var(--faint)}
-  .side.pick{border-color:var(--you);background:var(--you-soft)}
-  .side.correct{border-color:var(--win);background:var(--win-soft)}.side.wrong{border-color:var(--lose);background:var(--lose-soft);opacity:.72}
-  .side .ret{font-size:15px;font-weight:800;height:0;overflow:hidden;transition:height .3s}.side.revealed .ret{height:20px}
-  .vs{align-self:center;font-weight:900;font-size:13px;color:var(--faint);padding:0 6px}
-  .verdict{margin:12px 16px 0;padding:12px 14px;border-radius:14px;font-size:13px;line-height:1.4;display:none}
-  .verdict.show{display:block}.verdict.hit{background:var(--win-soft);border:1px solid color-mix(in srgb,var(--win) 30%,transparent)}
+  /* MC options (past) */
+  .options{display:flex;flex-direction:column;gap:9px;padding:12px 16px 0}
+  .optbtn{display:flex;align-items:center;gap:10px;text-align:left;padding:13px 14px;border-radius:14px;border:2px solid var(--line);
+    background:var(--surface);color:var(--ink);font-size:14.5px;font-weight:600;cursor:pointer;transition:border-color .12s,background .12s,transform .08s;font-family:inherit}
+  .optbtn:hover{border-color:var(--gold)}.optbtn:active{transform:scale(.99)}
+  .optbtn .mk{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);flex:none;display:grid;place-items:center;font-size:12px;font-weight:800}
+  .optbtn.correct{border-color:var(--win);background:var(--win-soft)}.optbtn.correct .mk{border-color:var(--win);background:var(--win);color:#fff}
+  .optbtn.wrong{border-color:var(--lose);background:var(--lose-soft)}.optbtn.wrong .mk{border-color:var(--lose);background:var(--lose);color:#fff}
+  /* present duo */
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 16px 0}
+  .opt{border:2px solid var(--line);border-radius:16px;padding:16px 10px;text-align:center;cursor:pointer;background:var(--surface);transition:border-color .12s,background .12s,transform .08s}
+  .opt:hover{border-color:var(--you)}.opt:active{transform:scale(.98)}.opt.pick{border-color:var(--you);background:var(--you-soft)}
+  .opt .em{font-size:24px}.opt .ol{font-size:16px;font-weight:800;margin-top:3px}.opt .od{font-size:11.5px;color:var(--muted)}
+  .single{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 16px 0}
+  /* future input */
+  .thesis{padding:14px 16px 0;display:flex;flex-direction:column;gap:9px}
+  .thesis .row{display:flex;gap:8px}
+  .thesis input{flex:1;padding:13px;border-radius:12px;border:2px solid var(--line);background:var(--surface-2);color:var(--ink);font-size:16px;font-weight:700;font-family:inherit;text-transform:uppercase}
+  .thesis input::placeholder{font-weight:600;color:var(--faint)}
+  .thesis .go{padding:0 18px;border:none;border-radius:12px;background:var(--algo);color:#fff;font-weight:800;font-size:14px;cursor:pointer}
+  .pickchips{display:flex;flex-wrap:wrap;gap:6px}
+  .pchip{font-size:12px;font-weight:700;padding:6px 10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);cursor:pointer}
+  /* reveal / verdict */
+  .verdict{margin:12px 16px 0;padding:12px 14px;border-radius:14px;font-size:13px;line-height:1.42;display:none}
+  .verdict.show{display:block}
+  .verdict.hit{background:var(--win-soft);border:1px solid color-mix(in srgb,var(--win) 30%,transparent)}
   .verdict.miss{background:var(--lose-soft);border:1px solid color-mix(in srgb,var(--lose) 30%,transparent)}
+  .verdict.info{background:var(--algo-soft);border:1px solid color-mix(in srgb,var(--algo) 30%,transparent)}
+  .verdict.wait{background:var(--surface-2);border:1px solid var(--line)}
   .verdict .vh{font-weight:800;font-size:14px;margin-bottom:3px}
-  .verdict .src{display:inline-block;margin-top:6px;font-size:10.5px;font-weight:700;color:var(--muted);background:var(--surface);border:1px solid var(--line);padding:2px 7px;border-radius:6px}
-  .nextRow{padding:12px 16px 0;display:none}.nextRow.show{display:block}
+  .verdict .src{display:inline-block;margin-top:7px;font-size:10.5px;font-weight:700;color:var(--muted);background:var(--surface);border:1px solid var(--line);padding:2px 7px;border-radius:6px}
+  .liveline{margin-top:7px;font-weight:800}
+  .nextRow{padding:12px 16px 16px;display:none}.nextRow.show{display:block}
   .nextBtn{width:100%;padding:13px;border:none;border-radius:14px;background:var(--ink);color:var(--surface);font-size:15px;font-weight:800;cursor:pointer}
-  .actions{display:flex;align-items:center;justify-content:center;gap:22px;padding:12px 0 14px}
-  .rbtn{width:52px;height:52px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:20px;cursor:pointer}
+  .actions{display:flex;align-items:center;justify-content:center;gap:22px;padding:10px 0 12px}
+  .rbtn{width:50px;height:50px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:19px;cursor:pointer}
   .hint{text-align:center;color:var(--faint);font-size:12px;padding-bottom:12px}
-  /* results / leaderboard */
+  /* results */
   .screen{flex:1;display:flex;flex-direction:column;padding:6px 18px 22px}
   .scoreCard{background:linear-gradient(150deg,var(--you),#ff9a5b);color:#fff;border-radius:20px;padding:20px;position:relative;overflow:hidden}
   .scoreCard .lbl{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.85}
-  .scoreCard .big{font-size:36px;font-weight:900;letter-spacing:-.03em;margin:6px 0 4px}
-  .scoreCard .badge{display:inline-flex;gap:6px;background:rgba(255,255,255,.2);padding:5px 11px;border-radius:999px;font-size:12.5px;font-weight:700}
+  .scoreCard .big{font-size:34px;font-weight:900;letter-spacing:-.03em;margin:6px 0 8px}
+  .rsum{display:flex;gap:8px;flex-wrap:wrap}
+  .rsum div{background:rgba(255,255,255,.18);padding:6px 11px;border-radius:10px;font-size:12.5px;font-weight:700}
   .lbrow{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;font-size:14px}
   .lbrow.me{background:var(--you-soft);border:1px solid color-mix(in srgb,var(--you) 30%,transparent)}
   .lbrow .rk{width:18px;font-weight:800;color:var(--faint)}.lbrow .nm{flex:1;font-weight:700}.lbrow .sc{font-weight:800}
@@ -98,7 +122,7 @@
   .stat .l{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
   .stat .v{font-size:18px;font-weight:800;margin-top:2px}
   .betanote{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.4}
-  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
   .chip{font-size:12px;font-weight:700;padding:6px 10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);cursor:pointer}
   footer{padding:14px 6px 4px;color:var(--faint);font-size:11px;text-align:center;line-height:1.5}footer b{color:var(--brand)}
   .hidden{display:none!important}
@@ -114,22 +138,18 @@
       <div class="live" id="live"><span class="dot"></span><span id="liveTxt">checking data…</span></div>
     </header>
     <div class="tabs">
-      <div class="tab active" data-tab="play">🔮 Flashback</div>
+      <div class="tab active" data-tab="play">🃏 Daily Deck</div>
       <div class="tab" data-tab="lab">📊 Position Lab</div>
     </div>
 
-    <!-- PLAY -->
     <section id="playView">
-      <div class="sub" id="sub">Call what already happened. Real returns, real answers.</div>
+      <div class="sub" id="sub">Past, present, future — learn how the world figured out what's valuable.</div>
       <div class="prog" id="prog"></div>
       <div class="deck" id="deck"></div>
-      <div class="actions" id="actions">
-        <button class="rbtn" id="undoBtn" title="Undo">↺</button>
-      </div>
-      <div class="hint" id="hint">Tap your call — it resolves instantly on real history</div>
+      <div class="actions" id="actions"><button class="rbtn" id="undoBtn" title="Undo">↺</button></div>
+      <div class="hint" id="hint">🏛️ past = real answers · 🔴 present = settles at close · 🔮 future = name your pick</div>
     </section>
 
-    <!-- LAB -->
     <section id="labView" class="hidden">
       <div class="lab">
         <div class="labhead">Add a buy — we do the math 📊</div>
@@ -144,235 +164,324 @@
         <div class="out" id="out"></div>
       </div>
     </section>
-
   </div>
   <footer>
-    <b>Called It</b> · prices are real, pulled live from Yahoo Finance when the server is running.<br>
-    static preview uses embedded history. run <b>node server.js</b> for the live beta engine.
+    <b>Called It</b> · past answers are real, present calls settle on live prices, future picks are yours to defend.<br>
+    run <b>node server.js</b> for the live engine (present + ticker checks).
   </footer>
 </div>
 
 <script>
-const API = { on:false };
-const $ = (s)=>document.querySelector(s);
-const pct = (x)=> (x>=0?'+':'')+(x*100).toFixed(1)+'%';
-const money = (x)=> (x<0?'-$':'$')+Math.abs(x).toFixed(2);
+const API={on:false};
+const $=(s)=>document.querySelector(s);
+const pct=(x)=>(x>=0?'+':'')+(x*100).toFixed(1)+'%';
+const money=(x)=>(x<0?'-$':'$')+Math.abs(x).toFixed(2);
+const shuffle=(a)=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
 
-// ---- embedded fallback pool (real approx annual returns) for the static preview ----
-// Shuffled each load so even offline it isn't the same 5 in the same order.
-const POOL = [
-  { period:'2023', q:"Flashback 2023 — who actually won?", a:{name:"Nvidia",tkr:"NVDA"}, b:{name:"Apple",tkr:"AAPL"},
-    fa:2.39, fb:0.48, hint:"One had the biggest year of any mega-cap that decade.",
-    why:"NVDA ~+239% as the AI-compute boom detonated; AAPL a solid ~+48%." },
-  { period:'2023', q:"Flashback 2023 — lunch rush winner?", a:{name:"Chipotle",tkr:"CMG"}, b:{name:"McDonald's",tkr:"MCD"},
-    fa:0.64, fb:0.12, hint:"Both were up. One nearly 5x'd the other.",
-    why:"CMG ~+64% on relentless traffic and price power; MCD a steady ~+12%." },
-  { period:'2024', q:"Flashback 2024 — what won your screen time?", a:{name:"Spotify",tkr:"SPOT"}, b:{name:"Netflix",tkr:"NFLX"},
-    fa:1.38, fb:0.83, hint:"Both crushed 2024. The audio one crushed harder.",
-    why:"SPOT ~+138% on its first profitable year; NFLX ~+83% on ads + the crackdown." },
-  { period:'2023', q:"Flashback 2023 — gym-fit war?", a:{name:"Lululemon",tkr:"LULU"}, b:{name:"Nike",tkr:"NKE"},
-    fa:0.60, fb:-0.06, hint:"One ran +60%. The other finished red.",
-    why:"LULU ~+60% on strong men's + international; NKE slipped ~-6%." },
-  { period:'2023', q:"Flashback 2023 — who ate your paycheck?", a:{name:"Uber",tkr:"UBER"}, b:{name:"DoorDash",tkr:"DASH"},
-    fa:1.49, fb:0.67, hint:"Both ran. One nearly 1.5x'd on the year.",
-    why:"UBER ~+149% hitting profitability; DASH a big ~+67%." },
-  { period:'2023', q:"2023: which chip printed?", a:{name:"Nvidia",tkr:"NVDA"}, b:{name:"AMD",tkr:"AMD"},
-    fa:2.39, fb:1.28, hint:"Both more than doubled. One tripled.",
-    why:"NVDA ~+239% vs AMD ~+128% — the whole sector ripped, NVDA led." },
-  { period:'2023', q:"Rewind to 2023 — social smackdown", a:{name:"Meta",tkr:"META"}, b:{name:"Google",tkr:"GOOGL"},
-    fa:1.94, fb:0.58, hint:"'Year of efficiency' paid off big for one.",
-    why:"META ~+194% on cost cuts + ad rebound; GOOGL ~+58%." },
-  { period:'2023', q:"2023 tape — crypto vs old-school pay", a:{name:"Coinbase",tkr:"COIN"}, b:{name:"PayPal",tkr:"PYPL"},
-    fa:3.91, fb:-0.14, hint:"One nearly 5x'd; the other finished red.",
-    why:"COIN ~+391% as crypto roared back; PYPL ~-14%." },
-  { period:'2023', q:"2023: EV kings", a:{name:"Tesla",tkr:"TSLA"}, b:{name:"Ford",tkr:"F"},
-    fa:1.01, fb:0.05, hint:"One doubled, one barely moved.",
-    why:"TSLA ~+101% on the AI/robotaxi narrative; Ford ~+5%." },
-  { period:'2024', q:"2024: who beat who?", a:{name:"Netflix",tkr:"NFLX"}, b:{name:"Disney",tkr:"DIS"},
-    fa:0.83, fb:0.09, hint:"Streaming winner took it in a walk.",
-    why:"NFLX ~+83% on ads + password crackdown; DIS ~+9%." },
-  { period:'2022', q:"2022: the year it all fell — who fell less?", a:{name:"Coca-Cola",tkr:"KO"}, b:{name:"Meta",tkr:"META"},
-    fa:0.07, fb:-0.64, hint:"One was green in a brutal year. One lost ~two-thirds.",
-    why:"KO ~+7% defensive; META ~-64% in the 2022 rout." },
-  { period:'2021', q:"2021: meme-era winner", a:{name:"Nvidia",tkr:"NVDA"}, b:{name:"Intel",tkr:"INTC"},
-    fa:1.25, fb:-0.03, hint:"One more than doubled; the other went nowhere.",
-    why:"NVDA ~+125% in 2021; INTC ~-3%." },
+// ---------------- PAST: history-of-value trivia (real answers) ----------------
+const PAST=[
+  { q:"Why did ancient civilizations agree that GOLD was valuable?",
+    opts:[["It's rare, doesn't corrode, and splits cleanly into coins",1],["A powerful king simply declared it so",0],["It's the hardest metal known",0],["It's naturally magnetic",0]],
+    why:"Gold won on physics: scarce, nearly indestructible (never rusts), and easy to weigh and divide. That's the recipe for a store of value long before paper money." },
+  { q:"What is MOST of the world's gold actually used for today?",
+    opts:[["Jewelry",1],["Phones & electronics",0],["Central-bank vaults",0],["Dentistry",0]],
+    why:"Jewelry is ~45% of demand, then investment bars/coins and central-bank reserves. Only a sliver goes into tech." },
+  { q:"What backed the US dollar until Nixon ended it in 1971?",
+    opts:[["Gold",1],["Silver",0],["Oil",0],["Nothing — it never was",0]],
+    why:"Under the gold standard, dollars were redeemable for gold. In 1971 Nixon closed the 'gold window' — since then the dollar is fiat, backed by trust." },
+  { q:"History's first famous market bubble (1630s Holland) was over…",
+    opts:[["Tulip bulbs",1],["Spices",0],["Gold mines",0],["Ship shares",0]],
+    why:"In 'Tulip Mania' a single rare bulb could cost more than a house — then collapsed overnight. The original speculative bubble." },
+  { q:"Crude oil — the most-traded commodity — is nicknamed…",
+    opts:[["Black gold",1],["Liquid steel",0],["Dark diamond",0],["Earth's blood",0]],
+    why:"'Black gold' — controlling oil built some of history's biggest fortunes and reshaped global power." },
+  { q:"First US company to close above a $1 TRILLION market cap (2018)?",
+    opts:[["Apple",1],["Microsoft",0],["Amazon",0],["ExxonMobil",0]],
+    why:"Apple crossed $1T in Aug 2018. Market cap = share price × shares outstanding — the price tag on the whole company." },
+  { q:"In 2010 someone paid 10,000 Bitcoin for two pizzas. At the 2021 peak those coins were worth about…",
+    opts:[["~$680 million",1],["~$50,000",0],["~$2 million",0],["~$9 billion",0]],
+    why:"At ~$68k/BTC, 10,000 coins ≈ $680M. 'Bitcoin Pizza Day' is the most expensive fast-food order ever." },
+  { q:"The world's first coins (~600 BC, Lydia) were struck from…",
+    opts:[["Electrum, a natural gold-silver alloy",1],["Pure gold",0],["Bronze",0],["Iron",0]],
+    why:"Lydia (modern Turkey) minted the first coins from electrum, standardizing trade — a leap beyond bartering goods directly." },
+  { q:"Nvidia became the world's most valuable company on the back of…",
+    opts:[["AI data-center GPUs",1],["Gaming consoles",0],["Crypto-mining rigs",0],["Smartphone chips",0]],
+    why:"The AI boom made Nvidia's data-center GPUs the 'picks and shovels' of the gold rush — demand outran supply for years." },
+  { q:"What makes wheat or oil a 'commodity'?",
+    opts:[["Every unit is interchangeable with any other",1],["It always rises in price",0],["Only governments may trade it",0],["It never expires",0]],
+    why:"Commodities are 'fungible' — one barrel of same-grade oil equals any other, so they trade purely on price." },
+  { q:"The first modern stock exchange (1602, Amsterdam) was built to trade shares of…",
+    opts:[["The Dutch East India Company",1],["A gold mine",0],["The Bank of England",0],["A spice farm",0]],
+    why:"The VOC was the first company to sell shares to the public — inventing the stock market so ordinary people could own a slice of a business." },
+  { q:"Gold is priced per OUNCE, not per pound, because…",
+    opts:[["It uses the 'troy ounce', an ancient precious-metal weight",1],["Gold is too light to weigh in pounds",0],["Dollars only work in ounces",0],["It's a modern marketing choice",0]],
+    why:"Precious metals use the troy ounce (~31.1g), a standard from medieval trade fairs in Troyes, France." },
 ];
 
-function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+// ---------------- FUTURE: commodity thesis → name a company ----------------
+const FUTURE=[
+  { q:"Solar keeps scaling and electricity gets ~30% cheaper by 2030. Which company cashes in?",
+    hint:"Think: who burns HUGE amounts of power to make their product?",
+    model:{tkr:"TSLA",name:"Tesla"}, picks:["TSLA","MSFT","NVDA"],
+    why:"Cheaper power lowers EV charging + Tesla's energy-storage costs. AI data-center operators (MSFT, GOOGL, NVDA-powered) win big on electricity bills too." },
+  { q:"Liquid cooling slashes water use in AI data centers. Which company rides that?",
+    hint:"Someone SELLS the cooling and power gear.",
+    model:{tkr:"VRT",name:"Vertiv"}, picks:["VRT","NVDA","MSFT"],
+    why:"Vertiv makes data-center cooling + power — a direct 'picks and shovels' play. Nvidia/Microsoft also win from cheaper, denser compute." },
+  { q:"Lithium prices fall 40% by 2030 as supply floods in. Who benefits?",
+    hint:"Cheaper batteries help whoever BUYS the most of them.",
+    model:{tkr:"TSLA",name:"Tesla"}, picks:["TSLA","GM","RIVN"],
+    why:"Batteries are ~a third of an EV's cost — cheaper lithium fattens margins for EV makers like Tesla and BYD." },
+  { q:"Nuclear restarts push uranium demand up. Name a beneficiary.",
+    hint:"Who digs it out of the ground?",
+    model:{tkr:"CCJ",name:"Cameco"}, picks:["CCJ","CEG","NVDA"],
+    why:"Cameco is a top uranium miner — rising demand + tight supply lifts the whole fuel chain." },
+  { q:"AI doubles US data-center electricity demand by 2030. Which power company wins?",
+    hint:"Always-on, clean baseload power is the prize.",
+    model:{tkr:"CEG",name:"Constellation Energy"}, picks:["CEG","VST","NEE"],
+    why:"Constellation runs the largest US nuclear fleet — exactly the 24/7 clean power AI data centers are signing deals for." },
+  { q:"Everything electrifies and copper runs short. Who benefits?",
+    hint:"Copper has to be MINED.",
+    model:{tkr:"FCX",name:"Freeport-McMoRan"}, picks:["FCX","SCCO","TSLA"],
+    why:"Freeport is a copper-mining giant — EVs, grids and data centers all need far more copper than supply can meet." },
+  { q:"GLP-1 weight-loss drugs keep booming. Name the company.",
+    hint:"Two names own the shots.",
+    model:{tkr:"LLY",name:"Eli Lilly"}, picks:["LLY","NVO","PFE"],
+    why:"Eli Lilly (Zepbound) and Novo Nordisk (Ozempic/Wegovy) own the GLP-1 wave — one of the biggest drug launches ever." },
+  { q:"Robotaxis go mainstream by 2030. Which company wins the streets?",
+    hint:"One makes cars; one makes the software driving them.",
+    model:{tkr:"GOOGL",name:"Alphabet (Waymo)"}, picks:["GOOGL","TSLA","UBER"],
+    why:"Alphabet's Waymo leads real driverless miles today; Tesla is the high-risk, high-reward bet on scaling its fleet." },
+  { q:"Bad harvests send cocoa prices to records. Which snack giant gets squeezed?",
+    hint:"This is a SHORT thesis — who PAYS more for the beans?",
+    model:{tkr:"HSY",name:"Hershey"}, picks:["HSY","MDLZ","SBUX"],
+    why:"Cocoa is Hershey's key input — spiking prices squeeze margins. Spotting INPUT costs is half of investing." },
+  { q:"AI + LNG exports push natural-gas demand up. Name a beneficiary.",
+    hint:"Who ships it overseas?",
+    model:{tkr:"LNG",name:"Cheniere Energy"}, picks:["LNG","XOM","CVX"],
+    why:"Cheniere is the largest US LNG exporter — more global demand flows straight through its terminals." },
+];
+
+// ---------------- PRESENT: live calls that settle at close ----------------
+const PRESENT_UNIVERSE=[
+  {tkr:"NVDA",name:"Nvidia"},{tkr:"AAPL",name:"Apple"},{tkr:"TSLA",name:"Tesla"},{tkr:"AMZN",name:"Amazon"},
+  {tkr:"META",name:"Meta"},{tkr:"SPOT",name:"Spotify"},{tkr:"NFLX",name:"Netflix"},{tkr:"AMD",name:"AMD"},
+  {tkr:"COIN",name:"Coinbase"},{tkr:"HOOD",name:"Robinhood"},{tkr:"DIS",name:"Disney"},{tkr:"UBER",name:"Uber"},
+  {tkr:"CMG",name:"Chipotle"},{tkr:"GOOGL",name:"Google"},{tkr:"SBUX",name:"Starbucks"},{tkr:"NKE",name:"Nike"},
+];
 
 let DECK=[]; let idx=0; const picks=[]; let awaiting=false; const hintUsed=[];
 
-async function loadDeck(){
-  if(API.on){
-    try{
-      const j=await fetch('/api/matchups?count=5').then(r=>r.json());
-      if(j.matchups && j.matchups.length){ DECK=j.matchups.map(m=>({...m, live:true})); return; }
-    }catch(e){}
-  }
-  DECK = shuffle(POOL).slice(0,5).map(m=>({...m, ra:m.fa, rb:m.fb, live:false}));
-}
-
 async function detectApi(){
-  try{
-    const r = await fetch('/api/health'); if(r.ok){ const j=await r.json(); API.on=!!j.ok; }
-  }catch(e){ API.on=false; }
+  try{ const r=await fetch('/api/health'); if(r.ok){const j=await r.json(); API.on=!!j.ok;} }catch(e){ API.on=false; }
   const el=$('#live');
   if(API.on){ el.classList.add('on'); $('#liveTxt').textContent='LIVE data'; }
-  else { $('#liveTxt').textContent='preview data'; }
+  else { $('#liveTxt').textContent='preview'; }
 }
 
-// each DECK card already carries its real returns (ra/rb), computed live or embedded
-function resolve(m){ return { a:m.ra, b:m.rb, live:m.live }; }
+function buildPresent(n){
+  const u=shuffle(PRESENT_UNIVERSE); const out=[];
+  for(let i=0;i<n;i++){
+    if(Math.random()<0.5){
+      out.push({type:'present',variant:'green',tkr:u[i].tkr,name:u[i].name,q:`Will ${u[i].name} (${u[i].tkr}) close GREEN today?`});
+    } else {
+      const a=u[i%u.length], b=u[(i+3)%u.length];
+      out.push({type:'present',variant:'vs',a,b,q:`Who's up more today — ${a.name} or ${b.name}?`});
+    }
+  }
+  return out;
+}
+function buildDeck(){
+  const past=shuffle(PAST).slice(0,3).map(x=>({type:'past',...x}));
+  const fut=shuffle(FUTURE).slice(0,2).map(x=>({type:'future',...x}));
+  const present = API.on ? buildPresent(2) : shuffle(FUTURE).slice(2,3).map(x=>({type:'future',...x}));
+  // if offline, backfill the "present" slot with an extra future so the deck stays full & interactive
+  DECK = shuffle([...past,...fut,...present]).slice(0,6);
+}
 
 function buildProg(){ $('#prog').innerHTML=''; DECK.forEach(()=>{const i=document.createElement('i');$('#prog').appendChild(i);}); }
 function paintProg(){[...$('#prog').children].forEach((el,i)=>{el.className=i<idx?'done':(i===idx?'cur':'')})}
 
-function cardInner(m){
-  return `<div class="kind"><span class="k">📅 ${m.period} flashback</span>
-    <button class="hintBtn" data-hint>💡 Hint</button></div>
-    <div class="q">${m.q}</div><div class="hintbox" data-box>💡 ${m.hint}</div>
-    <div class="versus">
-      <div class="side" data-choice="a"><div class="name">${m.a.name}</div><div class="tkr mono">${m.a.tkr}</div>
-        <div class="yr">${m.period}</div><div class="ret mono"></div></div>
-      <div class="vs">VS</div>
-      <div class="side" data-choice="b"><div class="name">${m.b.name}</div><div class="tkr mono">${m.b.tkr}</div>
-        <div class="yr">${m.period}</div><div class="ret mono"></div></div>
-    </div>
-    <div class="verdict" data-verdict></div>
-    <div class="nextRow" data-nextrow><button class="nextBtn" data-next>Next call →</button></div>`;
+function head(m){
+  const map={past:['past','🏛️ History of value','settle a real fact'],
+    present:['present','🔴 Today','settles at 4pm ET'],
+    future:['future','🔮 2030 thesis','name your pick']};
+  const [cls,label,tag]=map[m.type];
+  return `<div class="kind"><span class="k ${cls}">${label}</span><span class="timer">${tag}</span>${m.hint?`<button class="hintBtn" data-hint>💡 Hint</button>`:''}</div>
+    ${m.q?`<div class="q">${m.q}</div>`:''}${m.hint?`<div class="hintbox" data-box>💡 ${m.hint}</div>`:''}`;
 }
+function tail(){ return `<div class="verdict" data-verdict></div><div class="nextRow" data-nextrow><button class="nextBtn" data-next>Next →</button></div>`; }
+
+function cardInner(m){
+  if(m.type==='past'){
+    const opts=m._shuffledOpts || (m._shuffledOpts=shuffle(m.opts));
+    return head(m)+`<div class="options">${opts.map((o,i)=>
+      `<button class="optbtn" data-opt="${i}"><span class="mk">${String.fromCharCode(65+i)}</span><span>${o[0]}</span></button>`).join('')}</div>`+tail();
+  }
+  if(m.type==='present'){
+    if(m.variant==='green'){
+      return head(m)+`<div class="single"><div class="opt" data-choice="green"><div class="em">🟢</div><div class="ol">Green</div><div class="od">closes up</div></div>
+        <div class="opt" data-choice="red"><div class="em">🔴</div><div class="ol">Red</div><div class="od">closes down</div></div></div>`+tail();
+    }
+    return head(m)+`<div class="duo"><div class="opt" data-choice="a"><div class="ol">${m.a.name}</div><div class="od mono">${m.a.tkr}</div></div>
+        <div class="opt" data-choice="b"><div class="ol">${m.b.name}</div><div class="od mono">${m.b.tkr}</div></div></div>`+tail();
+  }
+  if(m.type==='future'){
+    return head(m)+`<div class="thesis">
+      <div class="row"><input data-tkr placeholder="TYPE A TICKER — e.g. TSLA" maxlength="6" autocomplete="off" spellcheck="false"/>
+        <button class="go" data-go>Call it</button></div>
+      <div class="pickchips">${(m.picks||[]).map(p=>`<span class="pchip" data-pchip="${p}">${p}</span>`).join('')}
+        <span class="pchip" data-pchip="?">something else…</span></div>
+    </div>`+tail();
+  }
+  return head(m);
+}
+
 function makeCard(m,i){
-  const c=document.createElement('div');c.className='card';c.dataset.i=i;c.innerHTML=cardInner(m);
-  c.querySelectorAll('[data-choice]').forEach(el=>el.addEventListener('click',()=>choose(i,el.dataset.choice)));
-  const hb=c.querySelector('[data-hint]'),box=c.querySelector('[data-box]');
-  hb.addEventListener('click',()=>{box.classList.add('show');hb.textContent='💡 used';hb.style.opacity=.5;hintUsed[i]=true;});
-  c.querySelector('[data-next]').addEventListener('click',()=>advance(c,i));
-  enableDrag(c,i);
+  const c=document.createElement('div'); c.className='card'; c.dataset.i=i; c.innerHTML=cardInner(m);
+  const hb=c.querySelector('[data-hint]'); if(hb){const box=c.querySelector('[data-box]');
+    hb.addEventListener('click',()=>{box.classList.add('show');hb.textContent='💡 used';hb.style.opacity=.5;hintUsed[i]=true;});}
+  c.querySelectorAll('[data-opt]').forEach(el=>el.addEventListener('click',()=>answerPast(c,i,+el.dataset.opt)));
+  c.querySelectorAll('[data-choice]').forEach(el=>el.addEventListener('click',()=>answerPresent(c,i,el.dataset.choice)));
+  const go=c.querySelector('[data-go]'); if(go){const inp=c.querySelector('[data-tkr]');
+    go.addEventListener('click',()=>answerFuture(c,i,inp.value));
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')answerFuture(c,i,inp.value);});
+    c.querySelectorAll('[data-pchip]').forEach(ch=>ch.addEventListener('click',()=>{ if(ch.dataset.pchip==='?'){inp.focus();return;} inp.value=ch.dataset.pchip; answerFuture(c,i,ch.dataset.pchip);}));}
+  const nb=c.querySelector('[data-next]'); nb.addEventListener('click',()=>advance(c));
   return c;
 }
 function render(){
   $('#deck').innerHTML='';
   if(idx>=DECK.length){ results(); return; }
   awaiting=false;
-  for(let j=Math.min(idx+1,DECK.length-1);j>=idx;j--){
-    const card=makeCard(DECK[j],j);
-    if(j>idx){card.style.transform='scale(.955) translateY(10px)';card.style.zIndex=1;} else card.style.zIndex=2;
-    $('#deck').appendChild(card);
-  }
+  const card=makeCard(DECK[idx],idx); card.style.zIndex=2; $('#deck').appendChild(card);
   paintProg(); $('#undoBtn').style.visibility=idx>0?'visible':'hidden';
 }
-async function choose(i,choice){
-  if(i!==idx||awaiting) return;
-  awaiting=true;
-  const m=DECK[idx], card=$(`.card[data-i="${i}"]`);
-  picks[i]={choice, hint:!!hintUsed[i]};
-  const r=resolve(m);
-  const win = r.a>r.b?'a':'b';
-  ['a','b'].forEach(k=>{
-    const s=card.querySelector(`.side[data-choice="${k}"]`);
-    const val=r[k]; s.querySelector('.ret').textContent=pct(val);
-    s.querySelector('.ret').classList.add(val>=0?'up':'down');
-    s.classList.add('revealed', k===win?'correct':'wrong');
-    s.style.pointerEvents='none';
-  });
-  const hit=choice===win;
-  picks[i].hit=hit;
-  const v=card.querySelector('[data-verdict]');
-  v.className='verdict show '+(hit?'hit':'miss');
-  v.innerHTML=`<div class="vh">${hit?'✅ Called it.':'❌ Missed it.'} ${m[win].name} actually won.</div>
-    <div>${m.why}</div><span class="src">📄 ${r.live?'live from Yahoo Finance':'embedded history'} · computed in-app</span>`;
-  card.querySelector('[data-nextrow]').classList.add('show');
+function showNext(card){ card.querySelector('[data-nextrow]').classList.add('show');
+  card.scrollTo({top:card.scrollHeight,behavior:'smooth'}); }
+function advance(card){ awaiting=false;
+  card.style.transition='transform .34s cubic-bezier(.4,0,.2,1),opacity .34s';
+  card.style.transform='translateY(-42px) scale(.94)'; card.style.opacity=0;
+  setTimeout(()=>{idx++;render();},200);
 }
-function advance(card,i){ awaiting=false;
-  card.style.transition='transform .38s cubic-bezier(.4,0,.2,1),opacity .38s';
-  card.style.transform=`translateX(${(picks[i].choice==='a'?-1:1)*520}px) rotate(${(picks[i].choice==='a'?-1:1)*14}deg)`;
-  card.style.opacity=0; setTimeout(()=>{idx++;render();},210);
+
+// ---- PAST: real right/wrong ----
+function answerPast(card,i,choiceIdx){
+  if(awaiting) return; awaiting=true;
+  const m=DECK[i]; const opts=m._shuffledOpts;
+  const correctIdx=opts.findIndex(o=>o[1]===1);
+  const hit=choiceIdx===correctIdx;
+  picks[i]={type:'past',hit};
+  card.querySelectorAll('[data-opt]').forEach((el,k)=>{el.style.pointerEvents='none';
+    if(k===correctIdx) el.classList.add('correct'); else if(k===choiceIdx) el.classList.add('wrong');});
+  const v=card.querySelector('[data-verdict]'); v.className='verdict show '+(hit?'hit':'miss');
+  v.innerHTML=`<div class="vh">${hit?'✅ Called it.':'❌ Not quite — the answer is '+opts[correctIdx][0]+'.'}</div>
+    <div>${m.why}</div><span class="src">🏛️ verified fact</span>`;
+  showNext(card);
 }
-function enableDrag(card,i){
-  let sx=0,dx=0,down=false;
-  card.addEventListener('pointerdown',e=>{if(i!==idx||awaiting)return;down=true;sx=e.clientX;card.style.transition='none';card.setPointerCapture(e.pointerId);});
-  card.addEventListener('pointermove',e=>{if(!down)return;dx=e.clientX-sx;card.style.transform=`translate(${dx}px,0) rotate(${dx*.04}deg)`;});
-  card.addEventListener('pointerup',()=>{if(!down)return;down=false;if(Math.abs(dx)>110)choose(i,dx<0?'a':'b');else{card.style.transition='transform .25s';card.style.transform='';}dx=0;});
+
+// ---- PRESENT: live standing, settles at close (surprise) ----
+async function answerPresent(card,i,choice){
+  if(awaiting) return; awaiting=true;
+  const m=DECK[i]; picks[i]={type:'present',choice};
+  card.querySelectorAll('[data-choice]').forEach(el=>{el.style.pointerEvents='none';if(el.dataset.choice===choice)el.classList.add('pick');});
+  const v=card.querySelector('[data-verdict]'); v.className='verdict show wait';
+  v.innerHTML=`<div class="vh">🔒 Locked.</div><div>Settles at market close (4pm ET) — come back to see if you called it.</div>`;
+  showNext(card);
+  if(!API.on){ v.querySelector('.vh').insertAdjacentHTML('afterend','<div class="liveline" style="color:var(--muted)">run the live server to see the real-time standing.</div>'); return; }
+  try{
+    const tickers = m.variant==='green' ? m.tkr : `${m.a.tkr},${m.b.tkr}`;
+    const j=await fetch('/api/live?tickers='+tickers).then(r=>r.json());
+    if(m.variant==='green'){
+      const q=j.results[m.tkr]; if(!q||!q.valid) return;
+      const leading=(q.changePct>=0)===(choice==='green');
+      v.querySelector('.vh').insertAdjacentHTML('afterend',
+        `<div class="liveline ${q.changePct>=0?'up':'down'}">${m.tkr} ${pct(q.changePct)} right now — you're currently ${leading?'🟢 winning':'🔴 losing'}.</div>`);
+    } else {
+      const qa=j.results[m.a.tkr], qb=j.results[m.b.tkr]; if(!qa||!qb||!qa.valid||!qb.valid) return;
+      const leader = qa.changePct>=qb.changePct?'a':'b';
+      v.querySelector('.vh').insertAdjacentHTML('afterend',
+        `<div class="liveline">${m.a.tkr} ${pct(qa.changePct)} · ${m.b.tkr} ${pct(qb.changePct)} — you're currently ${leader===choice?'🟢 winning':'🔴 losing'}.</div>`);
+    }
+  }catch(e){}
 }
+
+// ---- FUTURE: name a company, validate live, reveal model answer (no right/wrong) ----
+async function answerFuture(card,i,raw){
+  if(awaiting) return; const val=(raw||'').trim().toUpperCase().replace(/[^A-Z.]/g,'');
+  if(!val) return; awaiting=true;
+  const m=DECK[i]; picks[i]={type:'future',pick:val};
+  card.querySelectorAll('input,button,.pchip').forEach(el=>el.style.pointerEvents='none');
+  const v=card.querySelector('[data-verdict]'); v.className='verdict show info';
+  let validLine=`<div class="liveline">Your pick: <b>${val}</b> — logged as your thesis.</div>`;
+  showNext(card);
+  v.innerHTML=`<div class="vh">🔮 Thesis locked.</div>${validLine}
+    <div style="margin-top:6px">A commonly-cited winner here is <b>${m.model.tkr}</b> (${m.model.name}). ${m.why}</div>
+    <span class="src">🔮 the future has no 'right' answer — defend yours</span>`;
+  if(API.on){
+    try{ const j=await fetch('/api/live?tickers='+val).then(r=>r.json()); const q=j.results[val];
+      const ok=q&&q.valid;
+      v.querySelector('.liveline').innerHTML= ok
+        ? `Your pick: <b>${val}</b> — ✅ real ticker (${q.name}), ${pct(q.changePct)} today. Logged as your thesis.`
+        : `Your pick: <b>${val}</b> — ⚠️ couldn't find that ticker, double-check the symbol. Logged anyway.`;
+    }catch(e){}
+  }
+}
+
 $('#undoBtn').addEventListener('click',()=>{if(idx===0)return;idx--;picks[idx]=undefined;render();});
 
 function results(){
-  const n=picks.filter(Boolean).length, right=picks.filter(p=>p&&p.hit).length;
-  const board=[
-    {nm:'🤖 The Algo',sc:4},{nm:'Maya',sc:5},{nm:'You',sc:right,me:true},{nm:'Arjun',sc:3},{nm:'Riley',sc:2},
-  ].sort((a,b)=>b.sc-a.sc);
+  const pastRows=picks.filter(p=>p&&p.type==='past'); const pastRight=pastRows.filter(p=>p.hit).length;
+  const present=picks.filter(p=>p&&p.type==='present').length;
+  const future=picks.filter(p=>p&&p.type==='future').length;
+  const board=[{nm:'🤖 The Algo',sc:Math.min(pastRows.length,2)},{nm:'Maya',sc:pastRows.length},{nm:'You',sc:pastRight,me:true},{nm:'Arjun',sc:Math.max(0,pastRight-1)}]
+    .sort((a,b)=>b.sc-a.sc);
   $('#deck').innerHTML=''; $('#actions').classList.add('hidden'); $('#hint').classList.add('hidden'); $('#prog').classList.add('hidden');
-  $('#sub').textContent="Here's how the pod called it 👇";
-  const s=document.createElement('div');s.className='screen';
-  s.innerHTML=`<div class="scoreCard"><div class="lbl">Mudd Money · this week's tape</div>
-    <div class="big">You called ${right}/${n} right</div>
-    <div class="badge">🎯 real history · you vs the algo</div></div>
-    <div style="margin:16px 0 4px;font-weight:800">Leaderboard</div>
-    ${board.map((r,i)=>`<div class="lbrow ${r.me?'me':''}"><span class="rk">${i+1}</span><span class="nm">${r.nm}</span><span class="sc mono">${r.sc}/${n}</span></div>`).join('')}
-    <button class="calc" style="margin-top:16px" onclick="location.reload()">Play again ↺</button>`;
+  $('#sub').textContent="Here's your run 👇";
+  const s=document.createElement('div'); s.className='screen';
+  s.innerHTML=`<div class="scoreCard"><div class="lbl">Mudd Money · today</div>
+    <div class="big">${pastRight}/${pastRows.length} history called</div>
+    <div class="rsum"><div>🔴 ${present} live call${present===1?'':'s'} — settle at close</div><div>🔮 ${future} thesis logged</div></div></div>
+    <div style="margin:16px 0 4px;font-weight:800">Knowledge leaderboard</div>
+    ${board.map((r,i)=>`<div class="lbrow ${r.me?'me':''}"><span class="rk">${i+1}</span><span class="nm">${r.nm}</span><span class="sc mono">${r.sc}/${pastRows.length||1}</span></div>`).join('')}
+    <button class="calc" style="margin-top:16px" onclick="location.reload()">New deck ↺</button>`;
   $('#deck').style.flex='none'; $('#deck').appendChild(s);
 }
 
 // ---------- tabs ----------
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-  t.classList.add('active');
-  const play=t.dataset.tab==='play';
-  $('#playView').classList.toggle('hidden',!play);
-  $('#labView').classList.toggle('hidden',play);
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
+  const play=t.dataset.tab==='play'; $('#playView').classList.toggle('hidden',!play); $('#labView').classList.toggle('hidden',play);
 }));
 
 // ---------- Position Lab ----------
-['NVDA','SPOT','LULU','CMG','AAPL','UBER'].forEach(t=>{
-  const c=document.createElement('span');c.className='chip';c.textContent=t;
-  c.addEventListener('click',()=>{$('#fTicker').value=t;});
-  $('#chips').appendChild(c);
-});
-(function setDefaultDate(){ const d=new Date(); d.setFullYear(d.getFullYear()-1);
-  $('#fDate').value=d.toISOString().slice(0,10); })();
-
+['NVDA','SPOT','LULU','CMG','AAPL','UBER'].forEach(t=>{const c=document.createElement('span');c.className='chip';c.textContent=t;
+  c.addEventListener('click',()=>{$('#fTicker').value=t;});$('#chips').appendChild(c);});
+(function(){const d=new Date();d.setFullYear(d.getFullYear()-1);$('#fDate').value=d.toISOString().slice(0,10);})();
 $('#calcBtn').addEventListener('click',calcPosition);
 async function calcPosition(){
-  const ticker=$('#fTicker').value.trim().toUpperCase();
-  const amount=parseFloat($('#fAmount').value)||100;
-  const from=$('#fDate').value;
-  const out=$('#out');
-  out.classList.add('show'); out.innerHTML='crunching real prices…';
-  if(!API.on){
-    out.innerHTML=`<div style="font-weight:700">Live engine not running</div>
-      <div class="betanote">The Position Lab needs real prices. Start the server:<br>
-      <b>node server.js</b> → refresh → it'll compute your beta &amp; P&amp;L from live data.</div>`;
-    return;
-  }
+  const ticker=$('#fTicker').value.trim().toUpperCase(); const amount=parseFloat($('#fAmount').value)||100; const from=$('#fDate').value;
+  const out=$('#out'); out.classList.add('show'); out.innerHTML='crunching real prices…';
+  if(!API.on){ out.innerHTML=`<div style="font-weight:700">Live engine not running</div>
+    <div class="betanote">The Position Lab needs real prices. Run <b>node server.js</b> → refresh.</div>`; return; }
   try{
     const j=await fetch(`/api/position?ticker=${ticker}&amount=${amount}&from=${from}`).then(r=>r.json());
     if(j.error){ out.innerHTML=`<div style="font-weight:700">Couldn't compute</div><div class="betanote">${j.error}</div>`; return; }
     const gain=j.pnl>=0;
-    out.innerHTML=`
-      <div class="lbl" style="font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--muted)">${ticker} · since ${j.entryDate}</div>
+    out.innerHTML=`<div class="lbl" style="font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--muted)">${ticker} · since ${j.entryDate}</div>
       <div class="bignum ${gain?'up':'down'}">${money(j.value)} <span style="font-size:15px;color:var(--muted)">from ${money(j.invested)}</span></div>
       <div style="font-weight:800" class="${gain?'up':'down'}">${gain?'▲':'▼'} ${money(j.pnl)} (${pct(j.returnPct)})</div>
-      <div class="grid2">
-        <div class="stat"><div class="l">Beta vs SPY</div><div class="v">${j.beta.toFixed(2)}</div></div>
+      <div class="grid2"><div class="stat"><div class="l">Beta vs SPY</div><div class="v">${j.beta.toFixed(2)}</div></div>
         <div class="stat"><div class="l">Ann. volatility</div><div class="v">${(j.annualizedVol*100).toFixed(0)}%</div></div>
         <div class="stat"><div class="l">Entry price</div><div class="v mono">$${j.entryPrice.toFixed(2)}</div></div>
-        <div class="stat"><div class="l">Last price</div><div class="v mono">$${j.lastPrice.toFixed(2)}</div></div>
-      </div>
-      <div class="betanote"><b>Beta ${j.beta.toFixed(2)}</b> means this moved about ${j.beta.toFixed(1)}× the market.
-      ${j.beta>1.15?'High-beta — more of your gain (and risk) is just amplified market.':j.beta<0.85?'Defensive — it moved less than the market.':'Roughly in line with the market.'}
-      That's the OpenTrade beta lens: how much was the market, how much was the call.</div>`;
-  }catch(e){
-    out.innerHTML=`<div style="font-weight:700">Network error</div><div class="betanote">${e.message}</div>`;
-  }
+        <div class="stat"><div class="l">Last price</div><div class="v mono">$${j.lastPrice.toFixed(2)}</div></div></div>
+      <div class="betanote"><b>Beta ${j.beta.toFixed(2)}</b> means it moved about ${j.beta.toFixed(1)}× the market.
+      ${j.beta>1.15?'High-beta — more of your gain (and risk) is amplified market.':j.beta<0.85?'Defensive — it moved less than the market.':'Roughly in line with the market.'}
+      That's the OpenTrade beta lens: how much was the market vs. your call.</div>`;
+  }catch(e){ out.innerHTML=`<div style="font-weight:700">Network error</div><div class="betanote">${e.message}</div>`; }
 }
 
-async function init(){
-  await detectApi();
-  await loadDeck();
-  buildProg();
-  render();
-}
+async function init(){ await detectApi(); buildDeck(); buildProg(); render(); }
 init();
 </script>
 </body>

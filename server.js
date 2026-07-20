@@ -196,6 +196,28 @@ async function buildMatchup(used) {
   return null;
 }
 
+// live quotes for present-day calls + future-thesis ticker validation
+async function apiLive(params, res) {
+  const tickers = (params.get('tickers') || '').split(',').map((s) => s.trim()).filter(Boolean);
+  if (!tickers.length) return sendJson(res, 400, { error: 'pass ?tickers=NVDA' });
+  const results = {};
+  for (const t of tickers) {
+    try {
+      const q = await prices.quote(t);
+      results[t.toUpperCase()] = {
+        valid: true,
+        price: q.price,
+        previousClose: q.previousClose,
+        changePct: q.price / q.previousClose - 1,
+        name: q.name,
+      };
+    } catch (e) {
+      results[t.toUpperCase()] = { valid: false, error: e.message };
+    }
+  }
+  sendJson(res, 200, { results });
+}
+
 async function apiMatchups(params, res) {
   const count = Math.max(1, Math.min(8, parseInt(params.get('count') || '5', 10)));
   const used = new Set();
@@ -234,6 +256,7 @@ const server = http.createServer(async (req, res) => {
     if (u.pathname === '/api/range') return await apiRange(u.searchParams, res);
     if (u.pathname === '/api/position') return await apiPosition(u.searchParams, res);
     if (u.pathname === '/api/matchups') return await apiMatchups(u.searchParams, res);
+    if (u.pathname === '/api/live') return await apiLive(u.searchParams, res);
     if (u.pathname.startsWith('/api/')) return sendJson(res, 404, { error: 'unknown endpoint' });
     return serveStatic(req, res);
   } catch (e) {
