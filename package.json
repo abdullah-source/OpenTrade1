@@ -1,0 +1,16 @@
+{
+  "name": "called-it",
+  "version": "0.1.0",
+  "description": "Called It — a social foresight game for OpenTrade, backed by a real beta / P&L engine (zero dependencies).",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test",
+    "beta": "node scripts/beta.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED",
+  "private": true
+}
