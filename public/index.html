@@ -158,31 +158,60 @@ const $ = (s)=>document.querySelector(s);
 const pct = (x)=> (x>=0?'+':'')+(x*100).toFixed(1)+'%';
 const money = (x)=> (x<0?'-$':'$')+Math.abs(x).toFixed(2);
 
-// ---- embedded fallback (real approx annual returns) so the static preview still works ----
-const CALLS = [
-  { period:'2023', q:"Flashback 2023 — who actually won?",
-    a:{name:"Nvidia",tkr:"NVDA"}, b:{name:"Apple",tkr:"AAPL"}, from:'2023-01-01', to:'2023-12-31',
-    fa:2.39, fb:0.48, hint:"One had the single biggest year of any mega-cap that decade.",
-    why:"NVDA finished 2023 up ~239% as the AI-compute boom detonated; AAPL a solid ~+48%." },
-  { period:'2023', q:"Flashback 2023 — lunch rush winner?",
-    a:{name:"Chipotle",tkr:"CMG"}, b:{name:"McDonald's",tkr:"MCD"}, from:'2023-01-01', to:'2023-12-31',
-    fa:0.64, fb:0.12, hint:"Both were up. One nearly 5x'd the other's return.",
-    why:"CMG ~+64% in 2023 on relentless traffic and price power; MCD a steady ~+12%." },
-  { period:'2024', q:"Flashback 2024 — what won your screen time?",
-    a:{name:"Spotify",tkr:"SPOT"}, b:{name:"Netflix",tkr:"NFLX"}, from:'2024-01-01', to:'2024-12-31',
-    fa:1.38, fb:0.83, hint:"Both crushed it in 2024. The audio one crushed harder.",
-    why:"SPOT ~+138% on its first profitable year + price hikes; NFLX a huge ~+83% on ads + the crackdown." },
-  { period:'2023', q:"Flashback 2023 — gym-fit war?",
-    a:{name:"Lululemon",tkr:"LULU"}, b:{name:"Nike",tkr:"NKE"}, from:'2023-01-01', to:'2023-12-31',
-    fa:0.60, fb:-0.06, hint:"One ran +60%. The other actually finished the year red.",
-    why:"LULU ~+60% in 2023 on strong men's + international; NKE slipped ~-6%." },
-  { period:'2023', q:"Flashback 2023 — who ate your paycheck?",
-    a:{name:"Uber",tkr:"UBER"}, b:{name:"DoorDash",tkr:"DASH"}, from:'2023-01-01', to:'2023-12-31',
-    fa:1.49, fb:0.67, hint:"Both more than ran. One nearly 1.5x'd on the year.",
-    why:"UBER ~+149% in 2023 hitting profitability; DASH a big ~+67%." },
+// ---- embedded fallback pool (real approx annual returns) for the static preview ----
+// Shuffled each load so even offline it isn't the same 5 in the same order.
+const POOL = [
+  { period:'2023', q:"Flashback 2023 — who actually won?", a:{name:"Nvidia",tkr:"NVDA"}, b:{name:"Apple",tkr:"AAPL"},
+    fa:2.39, fb:0.48, hint:"One had the biggest year of any mega-cap that decade.",
+    why:"NVDA ~+239% as the AI-compute boom detonated; AAPL a solid ~+48%." },
+  { period:'2023', q:"Flashback 2023 — lunch rush winner?", a:{name:"Chipotle",tkr:"CMG"}, b:{name:"McDonald's",tkr:"MCD"},
+    fa:0.64, fb:0.12, hint:"Both were up. One nearly 5x'd the other.",
+    why:"CMG ~+64% on relentless traffic and price power; MCD a steady ~+12%." },
+  { period:'2024', q:"Flashback 2024 — what won your screen time?", a:{name:"Spotify",tkr:"SPOT"}, b:{name:"Netflix",tkr:"NFLX"},
+    fa:1.38, fb:0.83, hint:"Both crushed 2024. The audio one crushed harder.",
+    why:"SPOT ~+138% on its first profitable year; NFLX ~+83% on ads + the crackdown." },
+  { period:'2023', q:"Flashback 2023 — gym-fit war?", a:{name:"Lululemon",tkr:"LULU"}, b:{name:"Nike",tkr:"NKE"},
+    fa:0.60, fb:-0.06, hint:"One ran +60%. The other finished red.",
+    why:"LULU ~+60% on strong men's + international; NKE slipped ~-6%." },
+  { period:'2023', q:"Flashback 2023 — who ate your paycheck?", a:{name:"Uber",tkr:"UBER"}, b:{name:"DoorDash",tkr:"DASH"},
+    fa:1.49, fb:0.67, hint:"Both ran. One nearly 1.5x'd on the year.",
+    why:"UBER ~+149% hitting profitability; DASH a big ~+67%." },
+  { period:'2023', q:"2023: which chip printed?", a:{name:"Nvidia",tkr:"NVDA"}, b:{name:"AMD",tkr:"AMD"},
+    fa:2.39, fb:1.28, hint:"Both more than doubled. One tripled.",
+    why:"NVDA ~+239% vs AMD ~+128% — the whole sector ripped, NVDA led." },
+  { period:'2023', q:"Rewind to 2023 — social smackdown", a:{name:"Meta",tkr:"META"}, b:{name:"Google",tkr:"GOOGL"},
+    fa:1.94, fb:0.58, hint:"'Year of efficiency' paid off big for one.",
+    why:"META ~+194% on cost cuts + ad rebound; GOOGL ~+58%." },
+  { period:'2023', q:"2023 tape — crypto vs old-school pay", a:{name:"Coinbase",tkr:"COIN"}, b:{name:"PayPal",tkr:"PYPL"},
+    fa:3.91, fb:-0.14, hint:"One nearly 5x'd; the other finished red.",
+    why:"COIN ~+391% as crypto roared back; PYPL ~-14%." },
+  { period:'2023', q:"2023: EV kings", a:{name:"Tesla",tkr:"TSLA"}, b:{name:"Ford",tkr:"F"},
+    fa:1.01, fb:0.05, hint:"One doubled, one barely moved.",
+    why:"TSLA ~+101% on the AI/robotaxi narrative; Ford ~+5%." },
+  { period:'2024', q:"2024: who beat who?", a:{name:"Netflix",tkr:"NFLX"}, b:{name:"Disney",tkr:"DIS"},
+    fa:0.83, fb:0.09, hint:"Streaming winner took it in a walk.",
+    why:"NFLX ~+83% on ads + password crackdown; DIS ~+9%." },
+  { period:'2022', q:"2022: the year it all fell — who fell less?", a:{name:"Coca-Cola",tkr:"KO"}, b:{name:"Meta",tkr:"META"},
+    fa:0.07, fb:-0.64, hint:"One was green in a brutal year. One lost ~two-thirds.",
+    why:"KO ~+7% defensive; META ~-64% in the 2022 rout." },
+  { period:'2021', q:"2021: meme-era winner", a:{name:"Nvidia",tkr:"NVDA"}, b:{name:"Intel",tkr:"INTC"},
+    fa:1.25, fb:-0.03, hint:"One more than doubled; the other went nowhere.",
+    why:"NVDA ~+125% in 2021; INTC ~-3%." },
 ];
 
-let idx=0; const picks=[]; let awaiting=false; const hintUsed=[];
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+let DECK=[]; let idx=0; const picks=[]; let awaiting=false; const hintUsed=[];
+
+async function loadDeck(){
+  if(API.on){
+    try{
+      const j=await fetch('/api/matchups?count=5').then(r=>r.json());
+      if(j.matchups && j.matchups.length){ DECK=j.matchups.map(m=>({...m, live:true})); return; }
+    }catch(e){}
+  }
+  DECK = shuffle(POOL).slice(0,5).map(m=>({...m, ra:m.fa, rb:m.fb, live:false}));
+}
 
 async function detectApi(){
   try{
@@ -193,22 +222,10 @@ async function detectApi(){
   else { $('#liveTxt').textContent='preview data'; }
 }
 
-// resolve a matchup's real returns (live if API, else embedded)
-async function resolve(m){
-  if(API.on){
-    try{
-      const [ra,rb] = await Promise.all([
-        fetch(`/api/range?ticker=${m.a.tkr}&from=${m.from}&to=${m.to}`).then(r=>r.json()),
-        fetch(`/api/range?ticker=${m.b.tkr}&from=${m.from}&to=${m.to}`).then(r=>r.json()),
-      ]);
-      if(typeof ra.totalReturn==='number' && typeof rb.totalReturn==='number')
-        return { a:ra.totalReturn, b:rb.totalReturn, live:true };
-    }catch(e){}
-  }
-  return { a:m.fa, b:m.fb, live:false };
-}
+// each DECK card already carries its real returns (ra/rb), computed live or embedded
+function resolve(m){ return { a:m.ra, b:m.rb, live:m.live }; }
 
-CALLS.forEach(()=>{const i=document.createElement('i');$('#prog').appendChild(i);});
+function buildProg(){ $('#prog').innerHTML=''; DECK.forEach(()=>{const i=document.createElement('i');$('#prog').appendChild(i);}); }
 function paintProg(){[...$('#prog').children].forEach((el,i)=>{el.className=i<idx?'done':(i===idx?'cur':'')})}
 
 function cardInner(m){
@@ -236,10 +253,10 @@ function makeCard(m,i){
 }
 function render(){
   $('#deck').innerHTML='';
-  if(idx>=CALLS.length){ results(); return; }
+  if(idx>=DECK.length){ results(); return; }
   awaiting=false;
-  for(let j=Math.min(idx+1,CALLS.length-1);j>=idx;j--){
-    const card=makeCard(CALLS[j],j);
+  for(let j=Math.min(idx+1,DECK.length-1);j>=idx;j--){
+    const card=makeCard(DECK[j],j);
     if(j>idx){card.style.transform='scale(.955) translateY(10px)';card.style.zIndex=1;} else card.style.zIndex=2;
     $('#deck').appendChild(card);
   }
@@ -248,9 +265,9 @@ function render(){
 async function choose(i,choice){
   if(i!==idx||awaiting) return;
   awaiting=true;
-  const m=CALLS[idx], card=$(`.card[data-i="${i}"]`);
+  const m=DECK[idx], card=$(`.card[data-i="${i}"]`);
   picks[i]={choice, hint:!!hintUsed[i]};
-  const r=await resolve(m);
+  const r=resolve(m);
   const win = r.a>r.b?'a':'b';
   ['a','b'].forEach(k=>{
     const s=card.querySelector(`.side[data-choice="${k}"]`);
@@ -350,7 +367,13 @@ async function calcPosition(){
   }
 }
 
-detectApi().then(render);
+async function init(){
+  await detectApi();
+  await loadDeck();
+  buildProg();
+  render();
+}
+init();
 </script>
 </body>
 </html>
