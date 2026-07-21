@@ -81,6 +81,13 @@
   .thesis .go{padding:0 18px;border:none;border-radius:12px;background:var(--algo);color:#fff;font-weight:800;font-size:14px;cursor:pointer}
   .pickchips{display:flex;flex-wrap:wrap;gap:6px}
   .pchip{font-size:12px;font-weight:700;padding:6px 10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);cursor:pointer}
+  .backit{margin-top:11px;padding-top:11px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+  .backit .bl{font-size:12.5px;font-weight:800;color:var(--ink)}
+  .backit .brow{display:flex;gap:8px}
+  .backit input{flex:1;padding:11px;border-radius:11px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font-size:15px;font-weight:700;font-family:inherit}
+  .backed{font-size:12.5px;font-weight:600;line-height:1.42;background:var(--you-soft);border:1px solid color-mix(in srgb,var(--you) 30%,transparent);border-radius:10px;padding:9px 11px}
+  .bnote{font-size:12px;color:var(--muted)}
+  .countdown{font-variant-numeric:tabular-nums}
   /* reveal / verdict */
   .verdict{margin:12px 16px 0;padding:12px 14px;border-radius:14px;font-size:13px;line-height:1.42;display:none}
   .verdict.show{display:block}
@@ -307,9 +314,25 @@ function head(m){
     present:['present','🔴 Today','settles at 4pm ET'],
     future:['future','🔮 2030 thesis','name your pick']};
   const [cls,label,tag]=map[m.type];
-  return `<div class="kind"><span class="k ${cls}">${label}</span><span class="timer">${tag}</span>${m.hint?`<button class="hintBtn" data-hint>💡 Hint</button>`:''}</div>
+  const timer = m.type==='present'
+    ? `<span class="timer">⏳ closes in <span class="countdown">…</span></span>`
+    : `<span class="timer">${tag}</span>`;
+  return `<div class="kind"><span class="k ${cls}">${label}</span>${timer}${m.hint?`<button class="hintBtn" data-hint>💡 Hint</button>`:''}</div>
     ${m.q?`<div class="q">${m.q}</div>`:''}${m.hint?`<div class="hintbox" data-box>💡 ${m.hint}</div>`:''}`;
 }
+
+// ---- countdown to US market close (4pm ET) ----
+function msToClose(){
+  const now=new Date();
+  const et=new Date(now.toLocaleString('en-US',{timeZone:'America/New_York'}));
+  const close=new Date(et); close.setHours(16,0,0,0);
+  if(close<=et) close.setDate(close.getDate()+1);
+  while(close.getDay()===0||close.getDay()===6) close.setDate(close.getDate()+1);
+  return close-et;
+}
+function fmtDur(ms){ if(ms<=0)return'now'; const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;
+  return h>0?`${h}h ${m}m`:`${m}m ${ss}s`; }
+function tickClock(){ const t=fmtDur(msToClose()); document.querySelectorAll('.countdown').forEach(el=>el.textContent=t); }
 function tail(){ return `<div class="verdict" data-verdict></div><div class="nextRow" data-nextrow><button class="nextBtn" data-next>Next →</button></div>`; }
 
 function cardInner(m){
@@ -355,7 +378,7 @@ function render(){
   if(idx>=DECK.length){ results(); return; }
   awaiting=false;
   const card=makeCard(DECK[idx],idx); card.style.zIndex=2; $('#deck').appendChild(card);
-  paintProg(); $('#undoBtn').style.visibility=idx>0?'visible':'hidden';
+  paintProg(); tickClock(); $('#undoBtn').style.visibility=idx>0?'visible':'hidden';
 }
 function showNext(card){ card.querySelector('[data-nextrow]').classList.add('show');
   card.scrollTo({top:card.scrollHeight,behavior:'smooth'}); }
@@ -386,8 +409,8 @@ async function answerPresent(card,i,choice){
   const m=DECK[i]; picks[i]={type:'present',choice};
   card.querySelectorAll('[data-choice]').forEach(el=>{el.style.pointerEvents='none';if(el.dataset.choice===choice)el.classList.add('pick');});
   const v=card.querySelector('[data-verdict]'); v.className='verdict show wait';
-  v.innerHTML=`<div class="vh">🔒 Locked.</div><div>Settles at market close (4pm ET) — come back to see if you called it.</div>`;
-  showNext(card);
+  v.innerHTML=`<div class="vh">🔒 Locked.</div><div>Settles at market close — <b>⏳ <span class="countdown">…</span></b> to go. Come back to see if you called it.</div>`;
+  tickClock(); showNext(card);
   if(!API.on){ v.querySelector('.vh').insertAdjacentHTML('afterend','<div class="liveline" style="color:var(--muted)">run the live server to see the real-time standing.</div>'); return; }
   try{
     const tickers = m.variant==='green' ? m.tkr : `${m.a.tkr},${m.b.tkr}`;
@@ -406,26 +429,46 @@ async function answerPresent(card,i,choice){
   }catch(e){}
 }
 
-// ---- FUTURE: name a company, validate live, reveal model answer (no right/wrong) ----
+// ---- FUTURE: name a company, validate live, reveal model answer + "put $X on it" ----
 async function answerFuture(card,i,raw){
   if(awaiting) return; const val=(raw||'').trim().toUpperCase().replace(/[^A-Z.]/g,'');
   if(!val) return; awaiting=true;
   const m=DECK[i]; picks[i]={type:'future',pick:val};
-  card.querySelectorAll('input,button,.pchip').forEach(el=>el.style.pointerEvents='none');
+  // disable ONLY the thesis controls — never the Next button
+  card.querySelectorAll('.thesis input, .thesis .go, .thesis .pchip').forEach(el=>{el.style.pointerEvents='none';el.style.opacity=.55;});
   const v=card.querySelector('[data-verdict]'); v.className='verdict show info';
-  let validLine=`<div class="liveline">Your pick: <b>${val}</b> — logged as your thesis.</div>`;
-  showNext(card);
-  v.innerHTML=`<div class="vh">🔮 Thesis locked.</div>${validLine}
+  v.innerHTML=`<div class="vh">🔮 Thesis locked.</div>
+    <div class="liveline">Your pick: <b>${val}</b> — logged as your thesis.</div>
     <div style="margin-top:6px">A commonly-cited winner here is <b>${m.model.tkr}</b> (${m.model.name}). ${m.why}</div>
+    <div class="backit">
+      <span class="bl">Believe it? Put real money on ${val} 💸</span>
+      <div class="brow"><input data-amt inputmode="decimal" placeholder="$100"/><button class="go" data-back>Back it</button></div>
+      <div data-backout></div>
+    </div>
     <span class="src">🔮 the future has no 'right' answer — defend yours</span>`;
+  showNext(card);
+  let price=null;
   if(API.on){
     try{ const j=await fetch('/api/live?tickers='+val).then(r=>r.json()); const q=j.results[val];
-      const ok=q&&q.valid;
-      v.querySelector('.liveline').innerHTML= ok
-        ? `Your pick: <b>${val}</b> — ✅ real ticker (${q.name}), ${pct(q.changePct)} today. Logged as your thesis.`
-        : `Your pick: <b>${val}</b> — ⚠️ couldn't find that ticker, double-check the symbol. Logged anyway.`;
+      if(q&&q.valid){ price=q.price;
+        v.querySelector('.liveline').innerHTML=`Your pick: <b>${val}</b> — ✅ real ticker (${q.name}), ${pct(q.changePct)} today.`;
+      } else {
+        v.querySelector('.liveline').innerHTML=`Your pick: <b>${val}</b> — ⚠️ couldn't find that ticker, double-check the symbol. Logged anyway.`;
+      }
     }catch(e){}
   }
+  const backBtn=v.querySelector('[data-back]'), amtInp=v.querySelector('[data-amt]'), backOut=v.querySelector('[data-backout]');
+  async function doBack(){
+    const amt=parseFloat((amtInp.value||'').replace(/[^0-9.]/g,''))||100;
+    let px=price;
+    if(px==null && API.on){ try{const j=await fetch('/api/live?tickers='+val).then(r=>r.json());const q=j.results[val];if(q&&q.valid)px=q.price;}catch(e){} }
+    if(px==null){ backOut.innerHTML=`<div class="bnote">Couldn't price ${val} — the live server is needed to back a pick.</div>`; return; }
+    const shares=amt/px; picks[i].backed={amt,shares,px};
+    backOut.innerHTML=`<div class="backed">💸 Backing <b>${val}</b>: $${amt.toFixed(0)} → <b>${shares.toFixed(2)} shares</b> @ $${px.toFixed(2)}. We'll track this thesis for you.</div>`;
+    backBtn.textContent='Backed ✓'; backBtn.style.pointerEvents='none'; backBtn.style.opacity=.55; amtInp.style.pointerEvents='none';
+  }
+  backBtn.addEventListener('click',doBack);
+  amtInp.addEventListener('keydown',e=>{if(e.key==='Enter')doBack();});
 }
 
 $('#undoBtn').addEventListener('click',()=>{if(idx===0)return;idx--;picks[idx]=undefined;render();});
@@ -481,7 +524,7 @@ async function calcPosition(){
   }catch(e){ out.innerHTML=`<div style="font-weight:700">Network error</div><div class="betanote">${e.message}</div>`; }
 }
 
-async function init(){ await detectApi(); buildDeck(); buildProg(); render(); }
+async function init(){ await detectApi(); buildDeck(); buildProg(); render(); tickClock(); setInterval(tickClock,1000); }
 init();
 </script>
 </body>
