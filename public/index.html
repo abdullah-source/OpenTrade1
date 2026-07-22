@@ -3,7 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Called It — a daily market deck</title>
+<title>Called It. You have $100. Now what?</title>
+<meta name="description" content="A five minute daily deck that teaches investing with real market prices and zero jargon. By OpenTrade." />
+<meta property="og:title" content="Called It. You have $100. Now what?" />
+<meta property="og:description" content="A five minute daily deck that teaches investing with real market prices and zero jargon. Learn it by calling it." />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta name="theme-color" content="#FAF9F6" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
@@ -29,11 +35,11 @@
   .shell{max-width:600px;margin:0 auto;padding:0 24px 96px}
 
   /* ---------- header ---------- */
-  .top{display:flex;align-items:baseline;gap:12px;padding:28px 0 0}
+  .top{display:flex;align-items:baseline;gap:12px;padding:28px 0 0;flex-wrap:wrap}
   .wordmark{font-family:"Instrument Serif",serif;font-size:22px;letter-spacing:-0.01em}
   .wordmark a{color:var(--ink);text-decoration:none}
   .byline{font-size:13px;color:var(--faint)}
-  .top nav{margin-left:auto;display:flex;gap:20px;align-items:baseline}
+  .top nav{margin-left:auto;display:flex;gap:18px;align-items:baseline}
   .navlink{font-size:14px;color:var(--muted);text-decoration:none;border-bottom:1px solid transparent;cursor:pointer;background:none;border-top:none;border-left:none;border-right:none;padding:0;font-family:inherit}
   .navlink:hover{color:var(--ink);border-bottom-color:var(--line-strong)}
   .status{font-size:12px;color:var(--faint);display:inline-flex;align-items:center;gap:6px}
@@ -49,15 +55,15 @@
   .btn:hover{background:var(--accent-hover)}
   .btn:active{transform:scale(0.98)}
   .btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-  .btn.full{width:100%}
+  .btn:disabled{opacity:.6;cursor:default}
   .textbtn{background:none;border:none;padding:0;font-family:inherit;font-size:14px;color:var(--muted);
     cursor:pointer;border-bottom:1px solid var(--line-strong)}
   .textbtn:hover{color:var(--ink)}
 
   /* ---------- landing ---------- */
-  .landing{padding-top:88px}
+  .landing{padding-top:80px}
   .eyebrow{font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent)}
-  h1{font-family:"Instrument Serif",serif;font-weight:400;font-size:44px;line-height:1.08;
+  h1{font-family:"Instrument Serif",serif;font-weight:400;font-size:46px;line-height:1.06;
     letter-spacing:-0.02em;margin:16px 0 0;text-wrap:balance}
   .lede{font-size:19px;color:var(--muted);margin:20px 0 0;max-width:46ch}
   .landing .btn{margin-top:36px}
@@ -76,9 +82,9 @@
   .qcard{animation:enter 400ms cubic-bezier(0.22,1,0.36,1)}
   @keyframes enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
-  .meta{display:flex;align-items:baseline;gap:16px}
+  .meta{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
   .cardtype{font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase}
-  .cardtype.past{color:var(--muted)}
+  .cardtype.learn{color:var(--muted)}
   .cardtype.present{color:var(--accent)}
   .cardtype.future{color:var(--ink)}
   .meta .aux{font-size:13px;color:var(--faint)}
@@ -132,12 +138,12 @@
   .verdict.good{border-left-color:var(--green)}
   .verdict.bad{border-left-color:var(--red)}
   .verdict.neutral{border-left-color:var(--accent)}
-  .verdict .lead{font-weight:600;font-size:16px}
+  .verdict .lead{font-weight:600;font-size:16px;margin:0}
   .verdict .body{margin-top:6px;font-size:15px;color:var(--muted);line-height:1.55}
   .verdict .datum{margin-top:10px;font-size:14px}
 
   .backit{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
-  .backit .bl{font-size:14px;font-weight:600}
+  .backit .bl{font-size:14px;font-weight:600;margin:0}
   .backit .row{display:flex;gap:10px;margin-top:10px}
   .backit input{width:120px;padding:11px 12px;border:1px solid var(--line-strong);border-radius:var(--r-input);
     font-family:"JetBrains Mono",monospace;font-size:15px;background:var(--paper)}
@@ -151,15 +157,35 @@
   .summary{padding-top:72px}
   .score{font-family:"Instrument Serif",serif;font-size:40px;letter-spacing:-0.02em;margin:14px 0 0}
   .sumlines{margin-top:32px;border-top:1px solid var(--line)}
-  .sumline{display:flex;justify-content:space-between;align-items:baseline;padding:16px 0;border-bottom:1px solid var(--line)}
+  .sumline{display:flex;justify-content:space-between;align-items:baseline;padding:16px 0;border-bottom:1px solid var(--line);gap:16px}
   .sumline .l{font-size:15px;color:var(--muted)}
-  .sumline .v{font-weight:600}
+  .sumline .v{font-weight:600;text-align:right}
   .summary .btn{margin-top:36px}
-  .summary .aside{margin-top:16px;font-size:14px;color:var(--muted)}
+  .aside{margin-top:16px;font-size:14px;color:var(--muted)}
+  .aside a{color:var(--ink)}
+  .bridge{margin-top:40px;padding:22px;border:1px solid var(--line);border-radius:var(--r-card);background:var(--card)}
+  .bridge p{margin:0}
+  .bridge .bh{font-weight:600}
+  .bridge .bs{margin-top:4px;font-size:15px;color:var(--muted)}
+  .bridge a{color:var(--accent);font-weight:600;text-decoration:none}
+  .bridge a:hover{text-decoration:underline}
+
+  /* ---------- positions ---------- */
+  .positions{padding-top:56px}
+  .positions h2,.calc h2{font-family:"Instrument Serif",serif;font-weight:400;font-size:32px;margin:12px 0 0;letter-spacing:-0.01em}
+  .poslist{margin-top:32px;border-top:1px solid var(--line)}
+  .posrow{display:flex;align-items:baseline;gap:16px;padding:18px 0;border-bottom:1px solid var(--line)}
+  .posrow .tk{font-family:"JetBrains Mono",monospace;font-weight:600;font-size:15px;min-width:56px}
+  .posrow .nm{font-size:14px;color:var(--muted);flex:1}
+  .posrow .val{text-align:right}
+  .posrow .val .now{font-weight:600;font-family:"JetBrains Mono",monospace}
+  .posrow .val .chg{font-size:13px;font-family:"JetBrains Mono",monospace}
+  .posempty{margin-top:32px;font-size:16px;color:var(--muted);max-width:46ch}
+  .positions .btn{margin-top:36px}
+  .posmeta{font-size:12px;color:var(--faint);margin-top:14px}
 
   /* ---------- calculator ---------- */
   .calc{padding-top:56px}
-  .calc h2{font-family:"Instrument Serif",serif;font-weight:400;font-size:32px;margin:12px 0 0;letter-spacing:-0.01em}
   .calc .lede{font-size:16px;margin-top:12px}
   .form{margin-top:32px;display:flex;flex-direction:column;gap:18px;max-width:420px}
   .field label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
@@ -169,12 +195,12 @@
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .result{margin-top:36px;border-top:1px solid var(--line);padding-top:24px;display:none}
   .result.show{display:block}
-  .result .headline{font-family:"Instrument Serif",serif;font-size:34px;letter-spacing:-0.01em}
+  .result .headline{font-family:"Instrument Serif",serif;font-size:34px;letter-spacing:-0.01em;margin:0}
   .result .sub{margin-top:4px;font-size:16px;font-weight:600}
   .stats{margin-top:24px;display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--line)}
   .stat{padding:14px 0;border-bottom:1px solid var(--line)}
-  .stat .l{font-size:13px;color:var(--faint);letter-spacing:0.05em;text-transform:uppercase}
-  .stat .v{font-size:18px;font-weight:600;margin-top:2px}
+  .stat .l{font-size:13px;color:var(--faint);letter-spacing:0.05em;text-transform:uppercase;margin:0}
+  .stat .v{font-size:18px;font-weight:600;margin:2px 0 0}
   .note{margin-top:20px;font-size:14px;color:var(--muted);line-height:1.6;max-width:52ch}
 
   footer{margin-top:96px;padding-top:20px;border-top:1px solid var(--line);
@@ -182,9 +208,9 @@
 
   .hidden{display:none!important}
   @media (max-width:520px){
-    h1{font-size:34px}.question{font-size:23px}
+    h1{font-size:36px}.question{font-size:23px}
     .pair{grid-template-columns:1fr}
-    .landing{padding-top:56px}
+    .landing{padding-top:52px}
   }
   @media (prefers-reduced-motion:reduce){
     .qcard,.verdict{animation:none}
@@ -197,32 +223,33 @@
 
   <header class="top">
     <span class="wordmark"><a href="#" id="homeLink">Called It</a></span>
-    <span class="byline">an OpenTrade experiment</span>
+    <span class="byline">by OpenTrade</span>
     <nav>
-      <button class="navlink" id="calcLink">Position calculator</button>
+      <button class="navlink" id="posLink">My positions</button>
+      <button class="navlink" id="calcLink">Calculator</button>
       <span class="status" id="status"><i></i><span id="statusTxt">connecting</span></span>
     </nav>
   </header>
 
   <!-- LANDING -->
   <section id="landing" class="landing">
-    <p class="eyebrow">A daily market deck</p>
-    <h1>Six calls a day.<br/>Real answers, real prices.</h1>
-    <p class="lede">Learn how the market decides what's valuable — by calling it yourself. Every answer is checked against real data, nothing is simulated.</p>
+    <p class="eyebrow">For absolute beginners</p>
+    <h1>You have $100.<br/>Now what?</h1>
+    <p class="lede">Nobody teaches you this stuff. Called It does, five minutes a day. Real market prices, plain English, no jargon. You learn investing by calling it, not by reading a textbook.</p>
     <button class="btn" id="startBtn">Start today's deck</button>
 
     <div class="how">
       <div class="how-row">
         <span class="n">01</span>
-        <div><h3>Past</h3><p>The history of value — gold, the first coins, the first exchange. Right or wrong, and you learn why.</p></div>
+        <div><h3>Learn the game</h3><p>Questions about how money actually works. What a stock split does, how shorting makes money, why compounding is the whole trick. Miss one and you find out why.</p></div>
       </div>
       <div class="how-row">
         <span class="n">02</span>
-        <div><h3>Today</h3><p>A live call that settles at market close. You'll see where you stand in real time.</p></div>
+        <div><h3>Call today</h3><p>One live call on a real stock that settles at market close. You see where you stand in real time.</p></div>
       </div>
       <div class="how-row">
         <span class="n">03</span>
-        <div><h3>Future</h3><p>A 2030 thesis. Name the company you think benefits — and back it with a real position if you believe it.</p></div>
+        <div><h3>Back an idea</h3><p>Pick a company you believe in and back it with a practice $100. Real prices track it in My positions. No real money until you say so.</p></div>
       </div>
     </div>
   </section>
@@ -241,15 +268,28 @@
   <section id="summaryView" class="hidden summary">
     <p class="eyebrow">Deck complete</p>
     <div id="summaryBody"></div>
-    <button class="btn" id="againBtn">Play a new deck</button>
-    <p class="aside">Your live calls settle at 4:00pm ET — come back after close.</p>
+    <button class="btn" id="shareBtn">Challenge a friend</button>
+    <p class="aside"><button class="textbtn" id="againBtn">Play another deck</button> · Live calls settle at 4:00pm ET, come back after close.</p>
+    <div class="bridge">
+      <p class="bh">Ready for the real thing?</p>
+      <p class="bs">This whole deck runs on practice money. When you want to put actual dollars behind a call, that is what <a href="https://www.opentrade.live" target="_blank" rel="noopener">OpenTrade</a> is for.</p>
+    </div>
+  </section>
+
+  <!-- POSITIONS -->
+  <section id="posView" class="hidden positions">
+    <p class="eyebrow">My positions</p>
+    <h2>Practice money. Real prices.</h2>
+    <div id="posBody"></div>
+    <button class="btn" id="posPlayBtn">Play today's deck</button>
+    <p class="aside">When you want to hold these for real: <a href="https://www.opentrade.live" target="_blank" rel="noopener">OpenTrade</a>.</p>
   </section>
 
   <!-- CALCULATOR -->
   <section id="calcView" class="hidden calc">
     <p class="eyebrow">Position calculator</p>
     <h2>What is a position really doing?</h2>
-    <p class="lede">Enter a stock, an amount, and a purchase date. We pull real prices and show your return — and how much of it was just the market.</p>
+    <p class="lede">Enter a stock, an amount, and a purchase date. We pull real prices and show your return, and how much of it was just the market moving.</p>
     <div class="form">
       <div class="field"><label for="fTicker">Ticker</label><input id="fTicker" value="NVDA" autocomplete="off" spellcheck="false" /></div>
       <div class="grid2">
@@ -262,7 +302,7 @@
   </section>
 
   <footer>
-    <span>Prices via Yahoo Finance, computed live. Nothing here is investment advice.</span>
+    <span>Prices via Yahoo Finance, computed live. Practice positions only. Not investment advice.</span>
     <span class="mono" id="clockNote"></span>
   </footer>
 </div>
@@ -271,90 +311,103 @@
 const $=s=>document.querySelector(s);
 const API={on:false};
 const pct=x=>(x>=0?'+':'')+(x*100).toFixed(1)+'%';
-const money=x=>(x<0?'−$':'$')+Math.abs(x).toFixed(2);
+const money=x=>(x<0?'-$':'$')+Math.abs(x).toFixed(2);
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
 
-/* ---------------- content ---------------- */
-const PAST=[
-  { q:"Why did ancient civilizations settle on gold as money?",
-    opts:[["It is rare, does not corrode, and divides cleanly into coins",1],["A powerful king declared it valuable",0],["It is the hardest known metal",0],["It is naturally magnetic",0]],
-    why:"Gold won on physics: scarce, nearly indestructible, easy to weigh and divide. That is the recipe for a store of value — long before paper money." },
-  { q:"What is most of the world's gold actually used for today?",
-    opts:[["Jewelry",1],["Phones and electronics",0],["Central-bank vaults",0],["Dentistry",0]],
-    why:"Jewelry is roughly 45% of demand, followed by investment bars and central-bank reserves. Only a sliver goes into technology." },
-  { q:"What backed the US dollar until Nixon ended it in 1971?",
-    opts:[["Gold",1],["Silver",0],["Oil",0],["Nothing — it never was backed",0]],
-    why:"Under the gold standard, dollars were redeemable for gold. Nixon closed the gold window in 1971; since then the dollar is fiat, backed by trust in the issuer." },
-  { q:"History's first famous market bubble, in 1630s Holland, was over what?",
-    opts:[["Tulip bulbs",1],["Spices",0],["Gold mines",0],["Ship shares",0]],
-    why:"During tulip mania a single rare bulb could trade for more than a house — then the market collapsed almost overnight. The original speculative bubble." },
-  { q:"Which company was first in the US to close above a $1 trillion market value?",
-    opts:[["Apple",1],["Microsoft",0],["Amazon",0],["ExxonMobil",0]],
-    why:"Apple crossed $1T in August 2018. Market capitalization is share price times shares outstanding — the market's price tag on the whole company." },
-  { q:"In 2010 someone paid 10,000 bitcoin for two pizzas. At the 2021 peak, what were those coins worth?",
-    opts:[["About $680 million",1],["About $50,000",0],["About $2 million",0],["About $9 billion",0]],
-    why:"At roughly $68,000 per coin, 10,000 bitcoin was about $680 million — likely the most expensive meal ever purchased." },
-  { q:"The world's first coins, struck around 600 BC in Lydia, were made of what?",
-    opts:[["Electrum, a natural gold-silver alloy",1],["Pure gold",0],["Bronze",0],["Iron",0]],
-    why:"Lydia, in modern Turkey, minted the first standardized coins from electrum. Standard weights meant trade no longer required weighing metal every time." },
-  { q:"Nvidia became the world's most valuable company on the strength of what business?",
-    opts:[["AI data-center chips",1],["Gaming consoles",0],["Crypto-mining hardware",0],["Smartphone processors",0]],
-    why:"The AI boom made Nvidia's data-center GPUs the scarcest input in technology — the picks and shovels of the gold rush, with demand outrunning supply for years." },
-  { q:"What makes wheat or crude oil a 'commodity'?",
-    opts:[["Any unit is interchangeable with any other",1],["The price always rises over time",0],["Only governments may trade it",0],["It never expires",0]],
-    why:"Commodities are fungible: one barrel of same-grade oil equals any other, so the market trades purely on price rather than brand." },
-  { q:"The first modern stock exchange, Amsterdam 1602, existed to trade shares of what?",
-    opts:[["The Dutch East India Company",1],["A gold mine",0],["The Bank of England",0],["A spice plantation",0]],
-    why:"The Dutch East India Company was the first to sell shares to the public — inventing the stock market so ordinary people could own a slice of a business." },
-  { q:"Why is gold priced per ounce rather than per pound?",
-    opts:[["It uses the troy ounce, an old precious-metal standard",1],["Gold is too light to weigh in pounds",0],["US law requires it",0],["A modern marketing convention",0]],
-    why:"Precious metals trade in troy ounces (about 31.1 grams), a standard that survives from medieval European trade fairs." },
-  { q:"Crude oil earned which nickname as fortunes were built on it?",
-    opts:[["Black gold",1],["Liquid steel",0],["Dark diamond",0],["Earth's blood",0]],
-    why:"'Black gold' — control of oil built several of history's largest fortunes and redrew global power in the twentieth century." },
+/* ---------------- LEARN: how money actually works ---------------- */
+const LEARN=[
+  { q:"You own 1 share worth $50. The company does a 2-for-1 stock split. What do you have now?",
+    opts:[["2 shares worth about $25 each",1],["2 shares worth $50 each",0],["1 share worth $25",0],["Half a share worth $50",0]],
+    why:"A split cuts the pizza into more slices. You own more shares but the same value. Companies do it to make each share feel affordable, nothing about the business changed." },
+  { q:"Second to second, what actually sets a stock's price?",
+    opts:[["The last trade where a buyer's offer met a seller's ask",1],["A formula the stock exchange runs",0],["The company's own accountants",0],["Government regulators",0]],
+    why:"A stock price is just the most recent handshake. Someone offered to buy at a price, someone agreed to sell. No committee decides it, the crowd does." },
+  { q:"How do short sellers make money when a stock falls?",
+    opts:[["Borrow shares, sell them now, buy them back cheaper later",1],["Buy insurance from the exchange",0],["Bet against the company directly",0],["Sell shares they plan to buy someday",0]],
+    why:"Shorting is selling first and buying second. Borrow a share, sell it at $100, buy it back at $60, return it, keep the $40. If the stock rises instead, losses have no ceiling." },
+  { q:"In one sentence, what is an ETF?",
+    opts:[["One share that holds a whole basket of investments",1],["A loan you make to a company",0],["A savings account with a bonus rate",0],["A fund only professionals can buy",0]],
+    why:"An ETF wraps hundreds of stocks into a single share you can buy for a few dollars. One purchase, instant diversification. It is how most beginners should start." },
+  { q:"And a bond is basically what?",
+    opts:[["A loan you give out that pays you interest",1],["A tiny piece of company ownership",0],["A bank fee",0],["A kind of insurance policy",0]],
+    why:"Buy a bond and you are the lender. The government or company pays you interest and returns your money at the end. Steadier than stocks, smaller upside." },
+  { q:"Put $100 away at 10% a year and touch nothing. Roughly what is it in 30 years?",
+    opts:[["About $1,700",1],["About $400",0],["About $700",0],["About $130",0]],
+    why:"Growth on top of growth. 10% of a bigger number every year snowballs: $100 becomes about $1,745. Einstein supposedly called compounding the eighth wonder. Start early, that is the whole trick." },
+  { q:"Inflation runs 3% and your savings account pays 1%. What is really happening to your money?",
+    opts:[["It buys about 2% less every year",1],["It grows 1% a year, slowly but safely",0],["Nothing, savings are protected from inflation",0],["It grows 4% a year",0]],
+    why:"Prices rise faster than your balance. The number on screen grows but what it can buy shrinks. This is why people invest at all: cash quietly loses the race." },
+  { q:"Which of these spreads your risk the most?",
+    opts:[["One fund holding 500 companies across every industry",1],["Ten hot tech stocks",0],["One great company you researched deeply",0],["Gold, all of it in gold",0]],
+    why:"If one company fails you lose everything, if one of 500 fails you barely notice. That is diversification, the only free lunch in investing." },
+  { q:"A stock trades at a P/E of 50. What are you actually paying for?",
+    opts:[["$50 for every $1 of yearly profit",1],["$50 for every share",0],["50% of the company's earnings",0],["A guaranteed 50% return",0]],
+    why:"Price divided by earnings. A P/E of 50 means you pay $50 for each $1 the company earns in a year. High P/E means the crowd expects big growth, and gets punished if it does not come." },
+  { q:"Over the last hundred years, which grew wealth the most?",
+    opts:[["Stocks",1],["Gold",0],["Bonds",0],["Cash in a vault",0]],
+    why:"By a mile. US stocks returned about 10% a year over the last century, doubling roughly every 7 years. Gold mostly kept pace with inflation. Cash lost quietly the whole time." },
+  { q:"After the 1929 crash, how long before the US market got back to its old peak?",
+    opts:[["About 25 years",1],["About 2 years",0],["About 7 years",0],["It never fully recovered",0]],
+    why:"1954. A generation. The lesson is not that markets always bounce fast, it is that the price of stocks' high returns is stomaching long, ugly stretches." },
+  { q:"Buffett bet $1M that a plain index fund would beat elite hedge funds over 10 years. What happened?",
+    opts:[["The boring index fund won easily",1],["The hedge funds won easily",0],["It ended in a tie",0],["The bet was called off",0]],
+    why:"The S&P 500 fund returned about 126%, the hedge funds about 36% after fees. The uncomfortable truth of investing: cheap and boring beats clever and expensive, usually." },
+  { q:"The world's first company to sell shares to the public, in 1602, sometimes paid dividends in what?",
+    opts:[["Spices",1],["Gold coins only",0],["More shares only",0],["Land",0]],
+    why:"The Dutch East India Company occasionally paid shareholders in cloves and mace. A dividend is just the company handing profits back to owners, whatever form it takes." },
+  { q:"A company pays out its yearly dividend today. What usually happens to the share price this morning?",
+    opts:[["It opens lower by about the dividend amount",1],["It rises, dividends attract buyers",0],["Nothing, dividends are separate from price",0],["It doubles the dividend in gains",0]],
+    why:"The cash physically left the company, so each share is worth that much less. You did not gain free money, value moved from the share price into your pocket." },
+  { q:"'Going long' on a stock just means what?",
+    opts:[["Owning it because you expect it to rise",1],["Holding it for at least a year",0],["Buying a large amount",0],["Waiting for a dip before buying",0]],
+    why:"Long means you win if it goes up, short means you win if it goes down. Every position in every market is one or the other. You have been long things your whole life without the word." },
+  { q:"At the peak of tulip mania in 1637, one rare bulb traded for about the price of what?",
+    opts:[["A canal house in Amsterdam",1],["A loaf of bread",0],["A horse",0],["A ship",0]],
+    why:"Then the market vanished in weeks. Bubbles feel obvious afterward and irresistible during. Every generation gets at least one, the asset changes, the story never does." },
 ];
 
+/* ---------------- FUTURE: back an idea ---------------- */
 const FUTURE=[
   { q:"Solar keeps scaling and electricity gets about 30% cheaper by 2030. Which company benefits most?",
-    hint:"Think about who consumes enormous amounts of power to make their product.",
+    hint:"Who burns enormous amounts of power to make their product?",
     model:{tkr:"TSLA",name:"Tesla"}, picks:["TSLA","MSFT","NVDA"],
-    why:"Cheaper power lowers EV charging costs and improves the economics of Tesla's storage business. Data-center operators win on their largest utility bill too." },
-  { q:"Liquid cooling sharply cuts water use in AI data centers. Who rides that shift?",
-    hint:"Someone sells the cooling and power equipment.",
+    why:"Cheaper power means cheaper EV charging and better economics for battery storage. Data-center owners win on their biggest utility bill too." },
+  { q:"New cooling tech sharply cuts water use in AI data centers. Who rides that shift?",
+    hint:"Somebody sells the cooling and power equipment.",
     model:{tkr:"VRT",name:"Vertiv"}, picks:["VRT","NVDA","MSFT"],
-    why:"Vertiv sells data-center cooling and power infrastructure — a direct picks-and-shovels play on the buildout." },
-  { q:"Lithium prices fall 40% by 2030 as new supply arrives. Who benefits?",
+    why:"Vertiv sells the cooling and power gear inside data centers. When everyone digs for gold, sell shovels." },
+  { q:"Lithium prices fall 40% by 2030 as new mines open. Who benefits?",
     hint:"Cheaper batteries help whoever buys the most of them.",
     model:{tkr:"TSLA",name:"Tesla"}, picks:["TSLA","GM","RIVN"],
-    why:"Batteries are roughly a third of an EV's cost. Cheaper lithium flows straight into EV-maker margins." },
-  { q:"Nuclear restarts push uranium demand up through 2030. Name a beneficiary.",
+    why:"Batteries are roughly a third of an electric car's cost. Cheaper lithium flows straight into carmakers' profits." },
+  { q:"Countries restart nuclear plants and uranium demand climbs. Name a winner.",
     hint:"Who digs it out of the ground?",
     model:{tkr:"CCJ",name:"Cameco"}, picks:["CCJ","CEG","NVDA"],
-    why:"Cameco is one of the largest uranium miners; rising demand against tight supply lifts the whole fuel chain." },
-  { q:"AI roughly doubles US data-center electricity demand by 2030. Which power company wins?",
-    hint:"Always-on, carbon-free baseload is the prize.",
+    why:"Cameco is one of the biggest uranium miners on earth. More demand against tight supply lifts everyone who owns the fuel." },
+  { q:"AI roughly doubles America's data-center electricity use by 2030. Which power company wins?",
+    hint:"Always-on, carbon-free power is the prize.",
     model:{tkr:"CEG",name:"Constellation Energy"}, picks:["CEG","VST","NEE"],
-    why:"Constellation operates the largest US nuclear fleet — exactly the around-the-clock clean power that AI operators are signing long-term deals for." },
-  { q:"Everything electrifies and copper runs structurally short. Who benefits?",
+    why:"Constellation runs the largest US nuclear fleet, exactly the around-the-clock clean power AI companies are signing decade-long deals for." },
+  { q:"Everything electrifies and the world runs short of copper. Who benefits?",
     hint:"Copper has to be mined.",
     model:{tkr:"FCX",name:"Freeport-McMoRan"}, picks:["FCX","SCCO","TSLA"],
-    why:"Freeport is a copper-mining giant. EVs, grids, and data centers all need far more copper than current supply provides." },
-  { q:"GLP-1 weight-loss drugs keep growing through 2030. Name the company.",
+    why:"Freeport is a copper giant. Electric cars, power grids and data centers all need far more copper than mines currently produce." },
+  { q:"Weight-loss drugs keep booming through 2030. Name the company.",
     hint:"Two firms dominate the category.",
     model:{tkr:"LLY",name:"Eli Lilly"}, picks:["LLY","NVO","PFE"],
-    why:"Eli Lilly and Novo Nordisk own the GLP-1 category — among the largest drug launches in history." },
-  { q:"Robotaxis reach mainstream scale by 2030. Who wins the streets?",
-    hint:"One company makes cars; another makes the software that drives them.",
+    why:"Eli Lilly and Novo Nordisk own the weight-loss drug market, among the biggest medicine launches in history." },
+  { q:"Robotaxis actually go mainstream by 2030. Who wins the streets?",
+    hint:"One company makes the cars, another makes the software that drives them.",
     model:{tkr:"GOOGL",name:"Alphabet"}, picks:["GOOGL","TSLA","UBER"],
-    why:"Alphabet's Waymo leads real driverless miles today. Tesla is the higher-risk bet on converting its fleet with software." },
-  { q:"Poor harvests send cocoa to record prices. Which snack giant gets squeezed?",
-    hint:"This one is inverted — who has to pay more for beans?",
+    why:"Alphabet's Waymo does the most real driverless miles today. Tesla is the bolder bet that software can convert its existing cars." },
+  { q:"Bad harvests send cocoa prices to all-time records. Which snack giant gets squeezed?",
+    hint:"Flipped question: who has to PAY more for beans?",
     model:{tkr:"HSY",name:"Hershey"}, picks:["HSY","MDLZ","SBUX"],
-    why:"Cocoa is Hershey's key input, so record prices compress its margins. Spotting input costs is half of investing." },
-  { q:"AI demand plus LNG exports push natural gas consumption up. Name a beneficiary.",
+    why:"Cocoa is Hershey's main ingredient, so record prices eat its profits. Knowing a company's costs matters as much as knowing its sales." },
+  { q:"AI power demand plus exports push natural gas consumption up. Name a beneficiary.",
     hint:"Who ships it overseas?",
     model:{tkr:"LNG",name:"Cheniere Energy"}, picks:["LNG","XOM","CVX"],
-    why:"Cheniere is the largest US LNG exporter; growing global demand flows directly through its terminals." },
+    why:"Cheniere is America's largest natural gas exporter. Growing world demand flows straight through its terminals." },
 ];
 
 const PRESENT_UNIVERSE=[
@@ -363,6 +416,23 @@ const PRESENT_UNIVERSE=[
   {tkr:"COIN",name:"Coinbase"},{tkr:"HOOD",name:"Robinhood"},{tkr:"DIS",name:"Disney"},{tkr:"UBER",name:"Uber"},
   {tkr:"CMG",name:"Chipotle"},{tkr:"GOOGL",name:"Alphabet"},{tkr:"SBUX",name:"Starbucks"},{tkr:"NKE",name:"Nike"},
 ];
+
+/* ---------------- storage ---------------- */
+const store={
+  get positions(){ try{return JSON.parse(localStorage.getItem('ci_positions')||'[]');}catch(e){return[];} },
+  set positions(v){ localStorage.setItem('ci_positions',JSON.stringify(v)); },
+  get streak(){ try{return JSON.parse(localStorage.getItem('ci_streak')||'{"count":0,"last":""}');}catch(e){return{count:0,last:''};} },
+  set streak(v){ localStorage.setItem('ci_streak',JSON.stringify(v)); },
+};
+function bumpStreak(){
+  const today=new Date().toISOString().slice(0,10);
+  const s=store.streak;
+  if(s.last===today) return s.count;
+  const y=new Date(Date.now()-864e5).toISOString().slice(0,10);
+  const count=s.last===y?s.count+1:1;
+  store.streak={count,last:today};
+  return count;
+}
 
 /* ---------------- state ---------------- */
 let DECK=[], idx=0, results=[];
@@ -394,33 +464,33 @@ async function detectApi(){
 
 /* ---------------- deck build ---------------- */
 function buildDeck(){
-  const past=shuffle(PAST).slice(0,3).map(x=>({type:'past',...x}));
+  const learn=shuffle(LEARN).slice(0,3).map(x=>({type:'learn',...x}));
   const fut=shuffle(FUTURE).slice(0,2).map(x=>({type:'future',...x}));
   let present=[];
   if(API.on){
     const u=shuffle(PRESENT_UNIVERSE);
     present=[Math.random()<0.5
       ? {type:'present',variant:'close',tkr:u[0].tkr,name:u[0].name,q:`Will ${u[0].name} close higher today?`}
-      : {type:'present',variant:'vs',a:u[0],b:u[3],q:`Which is up more today — ${u[0].name} or ${u[3].name}?`}];
+      : {type:'present',variant:'vs',a:u[0],b:u[3],q:`Which is up more today, ${u[0].name} or ${u[3].name}?`}];
   } else {
-    present=shuffle(FUTURE).slice(2,3).map(x=>({type:'future',...x}));
+    present=[{type:'learn',...shuffle(LEARN).slice(3,4)[0]}];
   }
-  DECK=shuffle([...past,...fut,...present]);
+  DECK=shuffle([...learn,...fut,...present]);
   idx=0; results=[];
 }
 
 /* ---------------- views ---------------- */
 function show(view){
-  ['landing','deckView','summaryView','calcView'].forEach(id=>$('#'+id).classList.add('hidden'));
+  ['landing','deckView','summaryView','posView','calcView'].forEach(id=>$('#'+id).classList.add('hidden'));
   $('#'+view).classList.remove('hidden');
   window.scrollTo({top:0});
 }
 
 /* ---------------- card rendering ---------------- */
 const TYPE_META={
-  past:{label:'Past · history of value',cls:'past',aux:''},
-  present:{label:'Today · live call',cls:'present',aux:'settles at close, <span class="countdown mono"></span> to go'},
-  future:{label:'Future · 2030 thesis',cls:'future',aux:'no wrong answer — defend your pick'},
+  learn:{label:'Learn',cls:'learn',aux:'one right answer, and a reason'},
+  present:{label:'Live call',cls:'present',aux:'settles at close in <span class="countdown mono"></span>'},
+  future:{label:'Back an idea',cls:'future',aux:'no wrong answers, just yours'},
 };
 
 function renderCard(){
@@ -431,7 +501,7 @@ function renderCard(){
   const mount=$('#cardMount');
   const hintBtn=m.hint?`<button class="textbtn hintlink" data-hint>Show hint</button>`:'';
   let body='';
-  if(m.type==='past'){
+  if(m.type==='learn'){
     const opts=m._s||(m._s=shuffle(m.opts));
     body=`<div class="choices">${opts.map((o,i)=>
       `<button class="choice" data-opt="${i}"><span class="key">${String.fromCharCode(65+i)}</span><span>${o[0]}</span></button>`).join('')}</div>`;
@@ -445,7 +515,7 @@ function renderCard(){
           <button class="choice" data-choice="b"><span class="big">${m.b.name}</span><span class="sub mono">${m.b.tkr}</span></button></div>`;
   } else {
     body=`<div class="thesis">
-      <label for="thesisInput">Your pick — company ticker</label>
+      <label for="thesisInput">Your pick, as a stock symbol</label>
       <div class="row">
         <input id="thesisInput" placeholder="e.g. TSLA" maxlength="6" autocomplete="off" spellcheck="false"/>
         <button class="btn" data-lock>Lock it in</button>
@@ -465,7 +535,7 @@ function renderCard(){
 
   const hb=mount.querySelector('[data-hint]');
   if(hb) hb.addEventListener('click',()=>{mount.querySelector('[data-hinttext]').classList.add('show');hb.remove();});
-  mount.querySelectorAll('[data-opt]').forEach(el=>el.addEventListener('click',()=>answerPast(+el.dataset.opt)));
+  mount.querySelectorAll('[data-opt]').forEach(el=>el.addEventListener('click',()=>answerLearn(+el.dataset.opt)));
   mount.querySelectorAll('[data-choice]').forEach(el=>el.addEventListener('click',()=>answerPresent(el.dataset.choice)));
   const lock=mount.querySelector('[data-lock]');
   if(lock){
@@ -490,11 +560,11 @@ function advance(){
 }
 
 /* ---------------- answers ---------------- */
-function answerPast(i){
+function answerLearn(i){
   const m=DECK[idx], opts=m._s;
   const correct=opts.findIndex(o=>o[1]===1);
   const hit=i===correct;
-  results.push({type:'past',hit});
+  results.push({type:'learn',hit});
   const mount=$('#cardMount');
   mount.querySelectorAll('[data-opt]').forEach((el,k)=>{
     el.disabled=true;
@@ -502,7 +572,7 @@ function answerPast(i){
     else if(k===i)el.classList.add('wrong');
   });
   showVerdict(hit?'good':'bad',
-    hit?'Correct.':`Not quite — the answer is “${opts[correct][0]}.”`,
+    hit?'Called it.':`Not quite. The answer: "${opts[correct][0]}".`,
     m.why);
 }
 
@@ -515,7 +585,7 @@ async function answerPresent(choice){
     if(el.dataset.choice===choice)el.classList.add('picked');
   });
   const v=showVerdict('neutral','Locked in.',
-    `This settles at market close — <span class="countdown mono"></span> from now. Come back after 4:00pm ET for the result.`);
+    `This settles at market close, <span class="countdown mono"></span> from now. Come back after 4:00pm ET for the result.`);
   tickClock();
   if(!API.on) return;
   try{
@@ -525,11 +595,11 @@ async function answerPresent(choice){
     if(m.variant==='close'){
       const q=j.results[m.tkr]; if(!q||!q.valid)return;
       const leading=(q.changePct>=0)===(choice==='green');
-      line=`${m.tkr} is <span class="${q.changePct>=0?'up':'down'}">${pct(q.changePct)}</span> right now — your call is ${leading?'ahead':'behind'}.`;
+      line=`${m.tkr} is <span class="${q.changePct>=0?'up':'down'}">${pct(q.changePct)}</span> right now. Your call is ${leading?'ahead':'behind'}.`;
     } else {
       const qa=j.results[m.a.tkr],qb=j.results[m.b.tkr]; if(!qa||!qb||!qa.valid||!qb.valid)return;
       const leader=qa.changePct>=qb.changePct?'a':'b';
-      line=`${m.a.tkr} <span class="${qa.changePct>=0?'up':'down'}">${pct(qa.changePct)}</span> · ${m.b.tkr} <span class="${qb.changePct>=0?'up':'down'}">${pct(qb.changePct)}</span> — your call is ${leader===choice?'ahead':'behind'}.`;
+      line=`${m.a.tkr} <span class="${qa.changePct>=0?'up':'down'}">${pct(qa.changePct)}</span> · ${m.b.tkr} <span class="${qb.changePct>=0?'up':'down'}">${pct(qb.changePct)}</span>. Your call is ${leader===choice?'ahead':'behind'}.`;
     }
     v.insertAdjacentHTML('beforeend',`<p class="datum mono">${line}</p>`);
   }catch(e){}
@@ -542,31 +612,34 @@ async function answerFuture(raw){
   const rec={type:'future',pick:val}; results.push(rec);
   const mount=$('#cardMount');
   mount.querySelectorAll('.thesis input,.thesis .btn,.tickchip').forEach(el=>el.disabled=true);
-  const v=showVerdict('neutral',`Thesis locked: ${val}.`,
-    `${m.why}<br/><br/>A commonly cited answer here is <strong>${m.model.tkr}</strong> (${m.model.name}) — but the future has no answer key. Yours is logged.`);
-  let price=null;
+  const v=showVerdict('neutral',`Idea locked: ${val}.`,
+    `${m.why}<br/><br/>A commonly cited answer here is <strong>${m.model.tkr}</strong> (${m.model.name}), but the future has no answer key. Yours counts.`);
+  let price=null, coName=val;
   if(API.on){
     try{
       const j=await fetch('/api/live?tickers='+val).then(r=>r.json());
       const q=j.results[val];
-      if(q&&q.valid){price=q.price;
+      if(q&&q.valid){price=q.price;coName=q.name;
         v.insertAdjacentHTML('beforeend',`<p class="datum mono">${val} · ${q.name} · ${money(q.price)} · <span class="${q.changePct>=0?'up':'down'}">${pct(q.changePct)}</span> today</p>`);
       } else {
-        v.insertAdjacentHTML('beforeend',`<p class="datum">That ticker didn't match a listed company — check the symbol next time. Your pick is still logged.</p>`);
+        v.insertAdjacentHTML('beforeend',`<p class="datum">That symbol did not match a listed company. Your idea is still logged, check the ticker next time.</p>`);
       }
     }catch(e){}
   }
   if(price!=null){
     v.insertAdjacentHTML('beforeend',`<div class="backit">
-      <p class="bl">Believe it? Back ${val} with a position.</p>
+      <p class="bl">Believe it? Back ${val} with practice money.</p>
       <div class="row"><input data-amt inputmode="decimal" placeholder="$100"/><button class="btn" data-back>Back it</button></div>
-      <p class="backnote" data-backout></p></div>`);
+      <p class="backnote" data-backout>Real prices will track it in My positions. No real money.</p></div>`);
     const btn=v.querySelector('[data-back]'),amt=v.querySelector('[data-amt]'),out=v.querySelector('[data-backout]');
     const doBack=()=>{
       const a=parseFloat((amt.value||'').replace(/[^0-9.]/g,''))||100;
       const shares=a/price;
       rec.backed={amount:a,shares,price};
-      out.innerHTML=`Backed: ${money(a)} → <strong class="mono">${shares.toFixed(2)} shares</strong> at ${money(price)}. We'll track this thesis.`;
+      const list=store.positions;
+      list.push({tkr:val,name:coName,amount:a,shares,price,date:new Date().toISOString().slice(0,10)});
+      store.positions=list;
+      out.innerHTML=`Saved: ${money(a)} of ${val}, <strong class="mono">${shares.toFixed(2)} shares</strong> at ${money(price)}. See it under My positions.`;
       btn.disabled=true;btn.textContent='Backed';amt.disabled=true;
     };
     btn.addEventListener('click',doBack);
@@ -575,22 +648,70 @@ async function answerFuture(raw){
 }
 
 /* ---------------- summary ---------------- */
+let lastScoreText='';
 function renderSummary(){
-  const past=results.filter(r=>r.type==='past');
-  const right=past.filter(r=>r.hit).length;
+  const learn=results.filter(r=>r.type==='learn');
+  const right=learn.filter(r=>r.hit).length;
   const present=results.filter(r=>r.type==='present').length;
-  const theses=results.filter(r=>r.type==='future');
-  const backed=theses.filter(t=>t.backed);
+  const ideas=results.filter(r=>r.type==='future');
+  const backed=ideas.filter(t=>t.backed);
+  const day=bumpStreak();
+  lastScoreText=`I got ${right}/${learn.length} on today's Called It deck. Five minutes, real prices, plain English. Your turn: `;
   $('#summaryBody').innerHTML=`
-    <p class="score serif">${right} of ${past.length} history calls correct.</p>
+    <p class="score serif">${right} of ${learn.length} called right.</p>
     <div class="sumlines">
-      <div class="sumline"><span class="l">History of value</span><span class="v mono">${right}/${past.length}</span></div>
+      <div class="sumline"><span class="l">Streak</span><span class="v mono">day ${day}</span></div>
+      <div class="sumline"><span class="l">Learn questions</span><span class="v mono">${right}/${learn.length}</span></div>
       ${present?`<div class="sumline"><span class="l">Live calls awaiting close</span><span class="v mono">${present}</span></div>`:''}
-      <div class="sumline"><span class="l">Theses logged</span><span class="v mono">${theses.map(t=>t.pick).join(', ')||'—'}</span></div>
-      ${backed.length?`<div class="sumline"><span class="l">Positions backed</span><span class="v mono">${backed.map(t=>`${t.pick} ${money(t.backed.amount)}`).join(' · ')}</span></div>`:''}
+      <div class="sumline"><span class="l">Ideas logged</span><span class="v mono">${ideas.map(t=>t.pick).join(', ')||'none'}</span></div>
+      ${backed.length?`<div class="sumline"><span class="l">Backed with practice money</span><span class="v mono">${backed.map(t=>`${t.pick} ${money(t.backed.amount)}`).join(' · ')}</span></div>`:''}
     </div>`;
   show('summaryView');
   $('#barFill').style.width='100%';
+}
+
+async function shareScore(){
+  const btn=$('#shareBtn');
+  const text=lastScoreText||"Called It: a five minute daily deck that teaches investing with real prices. ";
+  const url=location.origin;
+  try{ if(navigator.share){ await navigator.share({title:'Called It',text,url}); return; } }catch(e){ return; }
+  try{ await navigator.clipboard.writeText(text+url); btn.textContent='Link copied'; setTimeout(()=>btn.textContent='Challenge a friend',1800); }catch(e){}
+}
+
+/* ---------------- positions ---------------- */
+async function renderPositions(){
+  show('posView');
+  const list=store.positions;
+  const body=$('#posBody');
+  if(!list.length){
+    body.innerHTML=`<p class="posempty">Nothing here yet. Play the deck, and when a Back an idea card comes up, put a practice $100 behind a company. It will show up here with live prices.</p>`;
+    return;
+  }
+  body.innerHTML=`<div class="poslist">${list.map((p,i)=>`
+    <div class="posrow" data-pos="${i}">
+      <span class="tk">${p.tkr}</span>
+      <span class="nm">${p.name||''} · ${money(p.amount)} on ${p.date}</span>
+      <span class="val"><div class="now">…</div><div class="chg"></div></span>
+    </div>`).join('')}</div>
+    <p class="posmeta">Practice positions, stored on this device. Prices refresh when you open this page.</p>`;
+  if(!API.on){
+    body.querySelectorAll('.now').forEach(el=>el.textContent='needs live server');
+    return;
+  }
+  try{
+    const tickers=[...new Set(list.map(p=>p.tkr))].join(',');
+    const j=await fetch('/api/live?tickers='+tickers).then(r=>r.json());
+    list.forEach((p,i)=>{
+      const q=j.results[p.tkr];
+      const row=body.querySelector(`[data-pos="${i}"] .val`);
+      if(!q||!q.valid){ row.querySelector('.now').textContent='no quote'; return; }
+      const now=p.shares*q.price, pnl=now-p.amount, r=now/p.amount-1;
+      row.querySelector('.now').textContent=money(now);
+      const chg=row.querySelector('.chg');
+      chg.textContent=`${pnl>=0?'+':''}${money(pnl).replace('$','$')} (${pct(r)})`;
+      chg.className='chg '+(pnl>=0?'up':'down');
+    });
+  }catch(e){}
 }
 
 /* ---------------- calculator ---------------- */
@@ -614,19 +735,22 @@ async function calcPosition(){
         <div class="stat"><p class="l">Entry price</p><p class="v mono">${money(j.entryPrice)}</p></div>
         <div class="stat"><p class="l">Last price</p><p class="v mono">${money(j.lastPrice)}</p></div>
       </div>
-      <p class="note">A beta of ${j.beta.toFixed(2)} means this stock moved about ${j.beta.toFixed(1)}× the market.
-      ${j.beta>1.15?'More of the gain — and the risk — was amplified market movement.':j.beta<0.85?'It moved less than the market: a defensive holding.':'It tracked the market closely.'}
-      That split — market versus your call — is the honest way to read any return.</p>`;
+      <p class="note">Beta of ${j.beta.toFixed(2)} means this stock moved about ${j.beta.toFixed(1)} times what the overall market did.
+      ${j.beta>1.15?'More of the gain, and the risk, was amplified market movement.':j.beta<0.85?'It moved less than the market, a defensive holding.':'It tracked the market closely.'}
+      Splitting a return into "the market" and "your call" is the honest way to read it.</p>`;
   }catch(e){out.innerHTML=`<p class="note">Network error: ${e.message}</p>`;}
 }
 
 /* ---------------- wiring ---------------- */
 $('#startBtn').addEventListener('click',()=>{buildDeck();show('deckView');renderCard();});
 $('#againBtn').addEventListener('click',()=>{buildDeck();show('deckView');renderCard();});
+$('#posPlayBtn').addEventListener('click',()=>{buildDeck();show('deckView');renderCard();});
 $('#quitBtn').addEventListener('click',()=>{results.length?renderSummary():show('landing');});
+$('#posLink').addEventListener('click',renderPositions);
 $('#calcLink').addEventListener('click',()=>show('calcView'));
 $('#homeLink').addEventListener('click',e=>{e.preventDefault();show('landing');});
 $('#calcBtn').addEventListener('click',calcPosition);
+$('#shareBtn').addEventListener('click',shareScore);
 (function(){const d=new Date();d.setFullYear(d.getFullYear()-1);$('#fDate').value=d.toISOString().slice(0,10);})();
 
 (async function init(){

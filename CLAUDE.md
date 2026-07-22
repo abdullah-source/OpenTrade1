@@ -33,6 +33,15 @@ Zero-dependency Node server + vanilla front-end. All market data is real.
   prices as if real. If data is unavailable, say so plainly.
 - **Copy:** plain, specific, confident. No hype, no "lessgo", no filler.
   Errors say what went wrong and what to do.
+- **No em dashes in UI copy.** Use commas or periods instead.
+- **Voice:** written for a total beginner (a kid with $100). Every jargon term
+  (ETF, shorting, P/E, beta) must be explained in plain English where it
+  appears. Never assume financial knowledge.
+- **Product shape:** landing (one CTA) → daily deck (Learn / Live call /
+  Back an idea) → summary (streak, share, OpenTrade bridge). "My positions"
+  is a separate page: practice positions persisted in localStorage, repriced
+  live on open. The app is the top-of-funnel mediator into OpenTrade
+  (opentrade.live); practice money always, and say so honestly.
 
 ## Workflow rules
 - Run `npm test` and `node --check` on the extracted front-end script before
