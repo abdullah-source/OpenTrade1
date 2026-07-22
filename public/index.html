@@ -2,326 +2,372 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Called It — OpenTrade</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Called It — a daily market deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
 <style>
   :root{
-    --bg:#E9E7F1;--bg-2:#E1DEEC;--surface:#FFFFFF;--surface-2:#F4F2FA;--line:#E4E1EE;
-    --ink:#17141F;--muted:#6C6579;--faint:#9E98AD;
-    --you:#FF6A2B;--you-soft:#FFEDE2;--algo:#5B6CF0;--algo-soft:#E9EBFF;
-    --gold:#C79A2E;--gold-soft:#F7EFD6;
-    --win:#12B886;--win-soft:#E4F7EF;--lose:#F03E5A;--lose-soft:#FCE7EB;--brand:#FF6A2B;
-    --shadow:0 24px 60px -20px rgba(24,18,40,.35),0 8px 20px -12px rgba(24,18,40,.25);--r:22px;
+    --paper:#FAF9F6; --card:#FFFFFF; --ink:#161412; --muted:#6B675F; --faint:#9B968C;
+    --line:#E7E4DD; --line-strong:#D8D4CA;
+    --accent:#C2410C; --accent-hover:#A93A0B; --accent-soft:#FBEDE6;
+    --green:#147A4D; --green-soft:#EAF4EF; --red:#B3362B; --red-soft:#F9ECEA;
+    --r-card:8px; --r-input:6px;
   }
-  @media (prefers-color-scheme:dark){:root{
-    --bg:#0C0A12;--bg-2:#141026;--surface:#191622;--surface-2:#221E30;--line:#2C2739;
-    --ink:#F4F2FA;--muted:#A49CB6;--faint:#726A85;--you:#FF7C3F;--you-soft:#37220F;
-    --algo:#8593FF;--algo-soft:#1C1E3A;--gold:#E4B84A;--gold-soft:#2A2312;
-    --win:#2BD69A;--win-soft:#0F2A22;--lose:#FF5C74;--lose-soft:#2E1620;--brand:#FF7C3F;
-    --shadow:0 30px 70px -20px rgba(0,0,0,.7),0 10px 24px -14px rgba(0,0,0,.6);
-  }}
-  *{box-sizing:border-box}html,body{margin:0;padding:0}
-  body{font-family:"SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-    color:var(--ink);background:radial-gradient(120% 90% at 15% 0%,var(--bg-2),transparent 60%),
-    radial-gradient(120% 90% at 90% 100%,var(--bg-2),transparent 55%),var(--bg);
-    min-height:100vh;display:flex;flex-direction:column;align-items:center;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-  .mono{font-family:"SF Mono",ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
-  .up{color:var(--win)}.down{color:var(--lose)}
-  .wrap{width:100%;max-width:430px;padding:22px 16px 40px;display:flex;flex-direction:column;flex:1}
-  .phone{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:34px;
-    box-shadow:var(--shadow);overflow:hidden;min-height:730px;display:flex;flex-direction:column}
-  header{display:flex;align-items:center;gap:10px;padding:18px 18px 6px}
-  .logo{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:-.02em;font-size:18px}
-  .logo .tick{width:26px;height:26px;border-radius:9px;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:15px}
-  .spacer{flex:1}
-  .live{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;padding:5px 10px;border-radius:999px;
-    background:var(--surface-2);border:1px solid var(--line);color:var(--muted)}
-  .live .dot{width:7px;height:7px;border-radius:50%;background:var(--faint)}
-  .live.on{color:var(--win)}.live.on .dot{background:var(--win);box-shadow:0 0 8px var(--win)}
-  .tabs{display:flex;gap:6px;padding:6px 16px 2px}
-  .tab{flex:1;text-align:center;padding:9px;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;
-    color:var(--muted);background:transparent;border:1px solid transparent}
-  .tab.active{background:var(--surface-2);border-color:var(--line);color:var(--ink)}
-  .sub{padding:4px 20px 4px;color:var(--muted);font-size:13px}
-  .prog{display:flex;gap:6px;padding:8px 20px 6px}
-  .prog i{height:5px;flex:1;border-radius:3px;background:var(--line);transition:background .3s}
-  .prog i.done{background:var(--brand)}.prog i.cur{background:var(--ink)}
-  .deck{position:relative;flex:1;margin:6px 16px 0;min-height:470px}
-  .card{position:absolute;inset:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
-    box-shadow:0 18px 40px -24px rgba(24,18,40,.5);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;touch-action:pan-y}
-  .kind{display:flex;align-items:center;gap:8px;padding:15px 16px 0}
-  .k{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:7px}
-  .k.past{color:var(--gold);background:var(--gold-soft)}
-  .k.present{color:var(--lose);background:var(--lose-soft)}
-  .k.future{color:var(--algo);background:var(--algo-soft)}
-  .hintBtn{margin-left:auto;font-size:11px;font-weight:800;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);padding:4px 9px;border-radius:7px;cursor:pointer}
-  .timer{font-size:11px;font-weight:700;color:var(--faint)}
-  .card .q{padding:10px 16px 4px;font-size:19px;font-weight:800;letter-spacing:-.02em;line-height:1.24}
-  .hintbox{margin:4px 16px 0;font-size:12px;color:var(--algo);background:var(--algo-soft);border-radius:10px;padding:8px 11px;display:none}
-  .hintbox.show{display:block}
-  /* MC options (past) */
-  .options{display:flex;flex-direction:column;gap:9px;padding:12px 16px 0}
-  .optbtn{display:flex;align-items:center;gap:10px;text-align:left;padding:13px 14px;border-radius:14px;border:2px solid var(--line);
-    background:var(--surface);color:var(--ink);font-size:14.5px;font-weight:600;cursor:pointer;transition:border-color .12s,background .12s,transform .08s;font-family:inherit}
-  .optbtn:hover{border-color:var(--gold)}.optbtn:active{transform:scale(.99)}
-  .optbtn .mk{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);flex:none;display:grid;place-items:center;font-size:12px;font-weight:800}
-  .optbtn.correct{border-color:var(--win);background:var(--win-soft)}.optbtn.correct .mk{border-color:var(--win);background:var(--win);color:#fff}
-  .optbtn.wrong{border-color:var(--lose);background:var(--lose-soft)}.optbtn.wrong .mk{border-color:var(--lose);background:var(--lose);color:#fff}
-  /* present duo */
-  .duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 16px 0}
-  .opt{border:2px solid var(--line);border-radius:16px;padding:16px 10px;text-align:center;cursor:pointer;background:var(--surface);transition:border-color .12s,background .12s,transform .08s}
-  .opt:hover{border-color:var(--you)}.opt:active{transform:scale(.98)}.opt.pick{border-color:var(--you);background:var(--you-soft)}
-  .opt .em{font-size:24px}.opt .ol{font-size:16px;font-weight:800;margin-top:3px}.opt .od{font-size:11.5px;color:var(--muted)}
-  .single{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 16px 0}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Instrument Sans",sans-serif;font-size:16px;line-height:1.5;
+    color:var(--ink);background:var(--paper);
+    -webkit-font-smoothing:antialiased;min-height:100vh;
+  }
+  .serif{font-family:"Instrument Serif",serif;font-weight:400}
+  .mono{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+  .up{color:var(--green)}.down{color:var(--red)}
+
+  .shell{max-width:600px;margin:0 auto;padding:0 24px 96px}
+
+  /* ---------- header ---------- */
+  .top{display:flex;align-items:baseline;gap:12px;padding:28px 0 0}
+  .wordmark{font-family:"Instrument Serif",serif;font-size:22px;letter-spacing:-0.01em}
+  .wordmark a{color:var(--ink);text-decoration:none}
+  .byline{font-size:13px;color:var(--faint)}
+  .top nav{margin-left:auto;display:flex;gap:20px;align-items:baseline}
+  .navlink{font-size:14px;color:var(--muted);text-decoration:none;border-bottom:1px solid transparent;cursor:pointer;background:none;border-top:none;border-left:none;border-right:none;padding:0;font-family:inherit}
+  .navlink:hover{color:var(--ink);border-bottom-color:var(--line-strong)}
+  .status{font-size:12px;color:var(--faint);display:inline-flex;align-items:center;gap:6px}
+  .status i{width:6px;height:6px;border-radius:50%;background:var(--faint);display:inline-block}
+  .status.on i{background:var(--green)}
+  .status.on{color:var(--green)}
+
+  /* ---------- buttons: ONE primary per screen ---------- */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:14px 28px;border-radius:var(--r-input);border:none;cursor:pointer;
+    font-family:inherit;font-size:16px;font-weight:600;
+    background:var(--accent);color:#fff;transition:background 150ms ease-out,transform 150ms ease-out}
+  .btn:hover{background:var(--accent-hover)}
+  .btn:active{transform:scale(0.98)}
+  .btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  .btn.full{width:100%}
+  .textbtn{background:none;border:none;padding:0;font-family:inherit;font-size:14px;color:var(--muted);
+    cursor:pointer;border-bottom:1px solid var(--line-strong)}
+  .textbtn:hover{color:var(--ink)}
+
+  /* ---------- landing ---------- */
+  .landing{padding-top:88px}
+  .eyebrow{font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent)}
+  h1{font-family:"Instrument Serif",serif;font-weight:400;font-size:44px;line-height:1.08;
+    letter-spacing:-0.02em;margin:16px 0 0;text-wrap:balance}
+  .lede{font-size:19px;color:var(--muted);margin:20px 0 0;max-width:46ch}
+  .landing .btn{margin-top:36px}
+  .how{margin-top:72px;border-top:1px solid var(--line);padding-top:8px}
+  .how-row{display:flex;gap:20px;padding:20px 0;border-bottom:1px solid var(--line)}
+  .how-row .n{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--faint);padding-top:3px}
+  .how-row h3{margin:0;font-size:16px;font-weight:600}
+  .how-row p{margin:4px 0 0;font-size:15px;color:var(--muted)}
+
+  /* ---------- deck ---------- */
+  .deckhead{display:flex;align-items:baseline;justify-content:space-between;padding:56px 0 12px}
+  .counter{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--muted)}
+  .bar{height:2px;background:var(--line);margin-bottom:40px}
+  .bar i{display:block;height:100%;background:var(--ink);transition:width 300ms ease-out}
+
+  .qcard{animation:enter 400ms cubic-bezier(0.22,1,0.36,1)}
+  @keyframes enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  .meta{display:flex;align-items:baseline;gap:16px}
+  .cardtype{font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase}
+  .cardtype.past{color:var(--muted)}
+  .cardtype.present{color:var(--accent)}
+  .cardtype.future{color:var(--ink)}
+  .meta .aux{font-size:13px;color:var(--faint)}
+  .meta .hintlink{margin-left:auto}
+  .question{font-family:"Instrument Serif",serif;font-weight:400;font-size:28px;line-height:1.2;
+    letter-spacing:-0.01em;margin:14px 0 0;text-wrap:balance}
+  .hinttext{margin:14px 0 0;font-size:15px;color:var(--muted);border-left:2px solid var(--line-strong);
+    padding-left:14px;display:none}
+  .hinttext.show{display:block}
+
+  .choices{margin-top:32px;display:flex;flex-direction:column;gap:10px}
+  .choice{display:flex;align-items:baseline;gap:14px;text-align:left;width:100%;
+    padding:16px 18px;border:1px solid var(--line-strong);border-radius:var(--r-card);
+    background:var(--card);color:var(--ink);font-family:inherit;font-size:16px;font-weight:500;
+    cursor:pointer;transition:border-color 150ms ease-out,background 150ms ease-out}
+  .choice:hover{border-color:var(--ink)}
+  .choice:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  .choice .key{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--faint)}
+  .choice .sub{font-size:14px;color:var(--muted);font-weight:400}
+  .choice.correct{border-color:var(--green);background:var(--green-soft)}
+  .choice.wrong{border-color:var(--red);background:var(--red-soft)}
+  .choice.picked{border-color:var(--ink)}
+  .choice:disabled{cursor:default}
+  .choice:disabled:hover{border-color:var(--line-strong)}
+  .choice.correct:disabled:hover{border-color:var(--green)}
+  .choice.wrong:disabled:hover{border-color:var(--red)}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:32px}
+  .pair .choice{flex-direction:column;align-items:flex-start;gap:2px;padding:20px 18px}
+  .pair .choice .big{font-size:18px;font-weight:600}
+
   /* future input */
-  .thesis{padding:14px 16px 0;display:flex;flex-direction:column;gap:9px}
-  .thesis .row{display:flex;gap:8px}
-  .thesis input{flex:1;padding:13px;border-radius:12px;border:2px solid var(--line);background:var(--surface-2);color:var(--ink);font-size:16px;font-weight:700;font-family:inherit;text-transform:uppercase}
-  .thesis input::placeholder{font-weight:600;color:var(--faint)}
-  .thesis .go{padding:0 18px;border:none;border-radius:12px;background:var(--algo);color:#fff;font-weight:800;font-size:14px;cursor:pointer}
-  .pickchips{display:flex;flex-wrap:wrap;gap:6px}
-  .pchip{font-size:12px;font-weight:700;padding:6px 10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);cursor:pointer}
-  .backit{margin-top:11px;padding-top:11px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
-  .backit .bl{font-size:12.5px;font-weight:800;color:var(--ink)}
-  .backit .brow{display:flex;gap:8px}
-  .backit input{flex:1;padding:11px;border-radius:11px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font-size:15px;font-weight:700;font-family:inherit}
-  .backed{font-size:12.5px;font-weight:600;line-height:1.42;background:var(--you-soft);border:1px solid color-mix(in srgb,var(--you) 30%,transparent);border-radius:10px;padding:9px 11px}
-  .bnote{font-size:12px;color:var(--muted)}
-  .countdown{font-variant-numeric:tabular-nums}
-  /* reveal / verdict */
-  .verdict{margin:12px 16px 0;padding:12px 14px;border-radius:14px;font-size:13px;line-height:1.42;display:none}
+  .thesis{margin-top:32px}
+  .thesis label{display:block;font-size:14px;font-weight:600;margin-bottom:8px}
+  .thesis .row{display:flex;gap:10px}
+  .thesis input{flex:1;padding:13px 14px;border:1px solid var(--line-strong);border-radius:var(--r-input);
+    background:var(--card);font-family:"JetBrains Mono",monospace;font-size:16px;color:var(--ink);
+    text-transform:uppercase}
+  .thesis input:focus{outline:2px solid var(--ink);outline-offset:-1px}
+  .suggest{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:baseline}
+  .suggest span{font-size:13px;color:var(--faint)}
+  .tickchip{font-family:"JetBrains Mono",monospace;font-size:13px;padding:5px 10px;
+    border:1px solid var(--line-strong);border-radius:999px;background:var(--card);cursor:pointer;color:var(--muted)}
+  .tickchip:hover{border-color:var(--ink);color:var(--ink)}
+
+  /* verdict */
+  .verdict{margin-top:32px;padding:20px 22px;border-radius:var(--r-card);background:var(--card);
+    border:1px solid var(--line);border-left:3px solid var(--line-strong);display:none;
+    animation:enter 300ms ease-out}
   .verdict.show{display:block}
-  .verdict.hit{background:var(--win-soft);border:1px solid color-mix(in srgb,var(--win) 30%,transparent)}
-  .verdict.miss{background:var(--lose-soft);border:1px solid color-mix(in srgb,var(--lose) 30%,transparent)}
-  .verdict.info{background:var(--algo-soft);border:1px solid color-mix(in srgb,var(--algo) 30%,transparent)}
-  .verdict.wait{background:var(--surface-2);border:1px solid var(--line)}
-  .verdict .vh{font-weight:800;font-size:14px;margin-bottom:3px}
-  .verdict .src{display:inline-block;margin-top:7px;font-size:10.5px;font-weight:700;color:var(--muted);background:var(--surface);border:1px solid var(--line);padding:2px 7px;border-radius:6px}
-  .liveline{margin-top:7px;font-weight:800}
-  .nextRow{padding:12px 16px 16px;display:none}.nextRow.show{display:block}
-  .nextBtn{width:100%;padding:13px;border:none;border-radius:14px;background:var(--ink);color:var(--surface);font-size:15px;font-weight:800;cursor:pointer}
-  .actions{display:flex;align-items:center;justify-content:center;gap:22px;padding:10px 0 12px}
-  .rbtn{width:50px;height:50px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:19px;cursor:pointer}
-  .hint{text-align:center;color:var(--faint);font-size:12px;padding-bottom:12px}
-  /* results */
-  .screen{flex:1;display:flex;flex-direction:column;padding:6px 18px 22px}
-  .scoreCard{background:linear-gradient(150deg,var(--you),#ff9a5b);color:#fff;border-radius:20px;padding:20px;position:relative;overflow:hidden}
-  .scoreCard .lbl{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.85}
-  .scoreCard .big{font-size:34px;font-weight:900;letter-spacing:-.03em;margin:6px 0 8px}
-  .rsum{display:flex;gap:8px;flex-wrap:wrap}
-  .rsum div{background:rgba(255,255,255,.18);padding:6px 11px;border-radius:10px;font-size:12.5px;font-weight:700}
-  .lbrow{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;font-size:14px}
-  .lbrow.me{background:var(--you-soft);border:1px solid color-mix(in srgb,var(--you) 30%,transparent)}
-  .lbrow .rk{width:18px;font-weight:800;color:var(--faint)}.lbrow .nm{flex:1;font-weight:700}.lbrow .sc{font-weight:800}
-  /* position lab */
-  .lab{padding:14px 18px 22px;display:flex;flex-direction:column;gap:12px}
-  .labhead{font-size:15px;font-weight:800}
-  .field{display:flex;flex-direction:column;gap:5px}
-  .field label{font-size:12px;font-weight:700;color:var(--muted)}
-  .field input{padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font-size:15px;font-family:inherit}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .calc{padding:14px;border:none;border-radius:14px;background:var(--brand);color:#fff;font-weight:800;font-size:15px;cursor:pointer}
-  .out{border:1px solid var(--line);border-radius:16px;padding:16px;background:var(--surface-2);display:none}
-  .out.show{display:block}
-  .bignum{font-size:30px;font-weight:900;letter-spacing:-.02em}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-  .stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px}
-  .stat .l{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-  .stat .v{font-size:18px;font-weight:800;margin-top:2px}
-  .betanote{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.4}
-  .chips{display:flex;flex-wrap:wrap;gap:6px}
-  .chip{font-size:12px;font-weight:700;padding:6px 10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);cursor:pointer}
-  footer{padding:14px 6px 4px;color:var(--faint);font-size:11px;text-align:center;line-height:1.5}footer b{color:var(--brand)}
+  .verdict.good{border-left-color:var(--green)}
+  .verdict.bad{border-left-color:var(--red)}
+  .verdict.neutral{border-left-color:var(--accent)}
+  .verdict .lead{font-weight:600;font-size:16px}
+  .verdict .body{margin-top:6px;font-size:15px;color:var(--muted);line-height:1.55}
+  .verdict .datum{margin-top:10px;font-size:14px}
+
+  .backit{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+  .backit .bl{font-size:14px;font-weight:600}
+  .backit .row{display:flex;gap:10px;margin-top:10px}
+  .backit input{width:120px;padding:11px 12px;border:1px solid var(--line-strong);border-radius:var(--r-input);
+    font-family:"JetBrains Mono",monospace;font-size:15px;background:var(--paper)}
+  .backit .btn{padding:11px 20px;font-size:15px}
+  .backnote{margin-top:10px;font-size:14px;color:var(--muted)}
+
+  .nextrow{margin-top:28px;display:none}
+  .nextrow.show{display:block}
+
+  /* ---------- summary ---------- */
+  .summary{padding-top:72px}
+  .score{font-family:"Instrument Serif",serif;font-size:40px;letter-spacing:-0.02em;margin:14px 0 0}
+  .sumlines{margin-top:32px;border-top:1px solid var(--line)}
+  .sumline{display:flex;justify-content:space-between;align-items:baseline;padding:16px 0;border-bottom:1px solid var(--line)}
+  .sumline .l{font-size:15px;color:var(--muted)}
+  .sumline .v{font-weight:600}
+  .summary .btn{margin-top:36px}
+  .summary .aside{margin-top:16px;font-size:14px;color:var(--muted)}
+
+  /* ---------- calculator ---------- */
+  .calc{padding-top:56px}
+  .calc h2{font-family:"Instrument Serif",serif;font-weight:400;font-size:32px;margin:12px 0 0;letter-spacing:-0.01em}
+  .calc .lede{font-size:16px;margin-top:12px}
+  .form{margin-top:32px;display:flex;flex-direction:column;gap:18px;max-width:420px}
+  .field label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+  .field input{width:100%;padding:13px 14px;border:1px solid var(--line-strong);border-radius:var(--r-input);
+    background:var(--card);font-size:16px;font-family:inherit;color:var(--ink)}
+  .field input:focus{outline:2px solid var(--ink);outline-offset:-1px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .result{margin-top:36px;border-top:1px solid var(--line);padding-top:24px;display:none}
+  .result.show{display:block}
+  .result .headline{font-family:"Instrument Serif",serif;font-size:34px;letter-spacing:-0.01em}
+  .result .sub{margin-top:4px;font-size:16px;font-weight:600}
+  .stats{margin-top:24px;display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--line)}
+  .stat{padding:14px 0;border-bottom:1px solid var(--line)}
+  .stat .l{font-size:13px;color:var(--faint);letter-spacing:0.05em;text-transform:uppercase}
+  .stat .v{font-size:18px;font-weight:600;margin-top:2px}
+  .note{margin-top:20px;font-size:14px;color:var(--muted);line-height:1.6;max-width:52ch}
+
+  footer{margin-top:96px;padding-top:20px;border-top:1px solid var(--line);
+    font-size:13px;color:var(--faint);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
   .hidden{display:none!important}
-  @media (prefers-reduced-motion:reduce){.card{transition:none!important}}
+  @media (max-width:520px){
+    h1{font-size:34px}.question{font-size:23px}
+    .pair{grid-template-columns:1fr}
+    .landing{padding-top:56px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .qcard,.verdict{animation:none}
+    .btn,.choice{transition:none}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="phone">
-    <header>
-      <div class="logo"><span class="tick">✓</span>Called It</div>
-      <div class="spacer"></div>
-      <div class="live" id="live"><span class="dot"></span><span id="liveTxt">checking data…</span></div>
-    </header>
-    <div class="tabs">
-      <div class="tab active" data-tab="play">🃏 Daily Deck</div>
-      <div class="tab" data-tab="lab">📊 Position Lab</div>
-    </div>
+<div class="shell">
 
-    <section id="playView">
-      <div class="sub" id="sub">Past, present, future — learn how the world figured out what's valuable.</div>
-      <div class="prog" id="prog"></div>
-      <div class="deck" id="deck"></div>
-      <div class="actions" id="actions"><button class="rbtn" id="undoBtn" title="Undo">↺</button></div>
-      <div class="hint" id="hint">🏛️ past = real answers · 🔴 present = settles at close · 🔮 future = name your pick</div>
-    </section>
+  <header class="top">
+    <span class="wordmark"><a href="#" id="homeLink">Called It</a></span>
+    <span class="byline">an OpenTrade experiment</span>
+    <nav>
+      <button class="navlink" id="calcLink">Position calculator</button>
+      <span class="status" id="status"><i></i><span id="statusTxt">connecting</span></span>
+    </nav>
+  </header>
 
-    <section id="labView" class="hidden">
-      <div class="lab">
-        <div class="labhead">Add a buy — we do the math 📊</div>
-        <div class="sub" style="padding:0">Enter a stock, an amount, and when you bought. We pull real prices and compute your P&amp;L, beta, and how much was just the market vs. your call.</div>
-        <div class="field"><label>Ticker</label><input id="fTicker" value="NVDA" autocomplete="off" spellcheck="false" /></div>
-        <div class="chips" id="chips"></div>
-        <div class="row2">
-          <div class="field"><label>Amount ($)</label><input id="fAmount" value="100" inputmode="decimal" /></div>
-          <div class="field"><label>Bought on</label><input id="fDate" type="date" /></div>
-        </div>
-        <button class="calc" id="calcBtn">Calculate my position</button>
-        <div class="out" id="out"></div>
+  <!-- LANDING -->
+  <section id="landing" class="landing">
+    <p class="eyebrow">A daily market deck</p>
+    <h1>Six calls a day.<br/>Real answers, real prices.</h1>
+    <p class="lede">Learn how the market decides what's valuable — by calling it yourself. Every answer is checked against real data, nothing is simulated.</p>
+    <button class="btn" id="startBtn">Start today's deck</button>
+
+    <div class="how">
+      <div class="how-row">
+        <span class="n">01</span>
+        <div><h3>Past</h3><p>The history of value — gold, the first coins, the first exchange. Right or wrong, and you learn why.</p></div>
       </div>
-    </section>
-  </div>
+      <div class="how-row">
+        <span class="n">02</span>
+        <div><h3>Today</h3><p>A live call that settles at market close. You'll see where you stand in real time.</p></div>
+      </div>
+      <div class="how-row">
+        <span class="n">03</span>
+        <div><h3>Future</h3><p>A 2030 thesis. Name the company you think benefits — and back it with a real position if you believe it.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DECK -->
+  <section id="deckView" class="hidden">
+    <div class="deckhead">
+      <span class="counter"><span id="qNum">1</span> of <span id="qTotal">6</span></span>
+      <button class="textbtn" id="quitBtn">End deck</button>
+    </div>
+    <div class="bar"><i id="barFill" style="width:0%"></i></div>
+    <div id="cardMount"></div>
+  </section>
+
+  <!-- SUMMARY -->
+  <section id="summaryView" class="hidden summary">
+    <p class="eyebrow">Deck complete</p>
+    <div id="summaryBody"></div>
+    <button class="btn" id="againBtn">Play a new deck</button>
+    <p class="aside">Your live calls settle at 4:00pm ET — come back after close.</p>
+  </section>
+
+  <!-- CALCULATOR -->
+  <section id="calcView" class="hidden calc">
+    <p class="eyebrow">Position calculator</p>
+    <h2>What is a position really doing?</h2>
+    <p class="lede">Enter a stock, an amount, and a purchase date. We pull real prices and show your return — and how much of it was just the market.</p>
+    <div class="form">
+      <div class="field"><label for="fTicker">Ticker</label><input id="fTicker" value="NVDA" autocomplete="off" spellcheck="false" /></div>
+      <div class="grid2">
+        <div class="field"><label for="fAmount">Amount ($)</label><input id="fAmount" value="100" inputmode="decimal" /></div>
+        <div class="field"><label for="fDate">Bought on</label><input id="fDate" type="date" /></div>
+      </div>
+      <button class="btn" id="calcBtn">Calculate</button>
+    </div>
+    <div class="result" id="calcResult"></div>
+  </section>
+
   <footer>
-    <b>Called It</b> · past answers are real, present calls settle on live prices, future picks are yours to defend.<br>
-    run <b>node server.js</b> for the live engine (present + ticker checks).
+    <span>Prices via Yahoo Finance, computed live. Nothing here is investment advice.</span>
+    <span class="mono" id="clockNote"></span>
   </footer>
 </div>
 
 <script>
+const $=s=>document.querySelector(s);
 const API={on:false};
-const $=(s)=>document.querySelector(s);
-const pct=(x)=>(x>=0?'+':'')+(x*100).toFixed(1)+'%';
-const money=(x)=>(x<0?'-$':'$')+Math.abs(x).toFixed(2);
-const shuffle=(a)=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const pct=x=>(x>=0?'+':'')+(x*100).toFixed(1)+'%';
+const money=x=>(x<0?'−$':'$')+Math.abs(x).toFixed(2);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
 
-// ---------------- PAST: history-of-value trivia (real answers) ----------------
+/* ---------------- content ---------------- */
 const PAST=[
-  { q:"Why did ancient civilizations agree that GOLD was valuable?",
-    opts:[["It's rare, doesn't corrode, and splits cleanly into coins",1],["A powerful king simply declared it so",0],["It's the hardest metal known",0],["It's naturally magnetic",0]],
-    why:"Gold won on physics: scarce, nearly indestructible (never rusts), and easy to weigh and divide. That's the recipe for a store of value long before paper money." },
-  { q:"What is MOST of the world's gold actually used for today?",
-    opts:[["Jewelry",1],["Phones & electronics",0],["Central-bank vaults",0],["Dentistry",0]],
-    why:"Jewelry is ~45% of demand, then investment bars/coins and central-bank reserves. Only a sliver goes into tech." },
+  { q:"Why did ancient civilizations settle on gold as money?",
+    opts:[["It is rare, does not corrode, and divides cleanly into coins",1],["A powerful king declared it valuable",0],["It is the hardest known metal",0],["It is naturally magnetic",0]],
+    why:"Gold won on physics: scarce, nearly indestructible, easy to weigh and divide. That is the recipe for a store of value — long before paper money." },
+  { q:"What is most of the world's gold actually used for today?",
+    opts:[["Jewelry",1],["Phones and electronics",0],["Central-bank vaults",0],["Dentistry",0]],
+    why:"Jewelry is roughly 45% of demand, followed by investment bars and central-bank reserves. Only a sliver goes into technology." },
   { q:"What backed the US dollar until Nixon ended it in 1971?",
-    opts:[["Gold",1],["Silver",0],["Oil",0],["Nothing — it never was",0]],
-    why:"Under the gold standard, dollars were redeemable for gold. In 1971 Nixon closed the 'gold window' — since then the dollar is fiat, backed by trust." },
-  { q:"History's first famous market bubble (1630s Holland) was over…",
+    opts:[["Gold",1],["Silver",0],["Oil",0],["Nothing — it never was backed",0]],
+    why:"Under the gold standard, dollars were redeemable for gold. Nixon closed the gold window in 1971; since then the dollar is fiat, backed by trust in the issuer." },
+  { q:"History's first famous market bubble, in 1630s Holland, was over what?",
     opts:[["Tulip bulbs",1],["Spices",0],["Gold mines",0],["Ship shares",0]],
-    why:"In 'Tulip Mania' a single rare bulb could cost more than a house — then collapsed overnight. The original speculative bubble." },
-  { q:"Crude oil — the most-traded commodity — is nicknamed…",
-    opts:[["Black gold",1],["Liquid steel",0],["Dark diamond",0],["Earth's blood",0]],
-    why:"'Black gold' — controlling oil built some of history's biggest fortunes and reshaped global power." },
-  { q:"First US company to close above a $1 TRILLION market cap (2018)?",
+    why:"During tulip mania a single rare bulb could trade for more than a house — then the market collapsed almost overnight. The original speculative bubble." },
+  { q:"Which company was first in the US to close above a $1 trillion market value?",
     opts:[["Apple",1],["Microsoft",0],["Amazon",0],["ExxonMobil",0]],
-    why:"Apple crossed $1T in Aug 2018. Market cap = share price × shares outstanding — the price tag on the whole company." },
-  { q:"In 2010 someone paid 10,000 Bitcoin for two pizzas. At the 2021 peak those coins were worth about…",
-    opts:[["~$680 million",1],["~$50,000",0],["~$2 million",0],["~$9 billion",0]],
-    why:"At ~$68k/BTC, 10,000 coins ≈ $680M. 'Bitcoin Pizza Day' is the most expensive fast-food order ever." },
-  { q:"The world's first coins (~600 BC, Lydia) were struck from…",
+    why:"Apple crossed $1T in August 2018. Market capitalization is share price times shares outstanding — the market's price tag on the whole company." },
+  { q:"In 2010 someone paid 10,000 bitcoin for two pizzas. At the 2021 peak, what were those coins worth?",
+    opts:[["About $680 million",1],["About $50,000",0],["About $2 million",0],["About $9 billion",0]],
+    why:"At roughly $68,000 per coin, 10,000 bitcoin was about $680 million — likely the most expensive meal ever purchased." },
+  { q:"The world's first coins, struck around 600 BC in Lydia, were made of what?",
     opts:[["Electrum, a natural gold-silver alloy",1],["Pure gold",0],["Bronze",0],["Iron",0]],
-    why:"Lydia (modern Turkey) minted the first coins from electrum, standardizing trade — a leap beyond bartering goods directly." },
-  { q:"Nvidia became the world's most valuable company on the back of…",
-    opts:[["AI data-center GPUs",1],["Gaming consoles",0],["Crypto-mining rigs",0],["Smartphone chips",0]],
-    why:"The AI boom made Nvidia's data-center GPUs the 'picks and shovels' of the gold rush — demand outran supply for years." },
-  { q:"What makes wheat or oil a 'commodity'?",
-    opts:[["Every unit is interchangeable with any other",1],["It always rises in price",0],["Only governments may trade it",0],["It never expires",0]],
-    why:"Commodities are 'fungible' — one barrel of same-grade oil equals any other, so they trade purely on price." },
-  { q:"The first modern stock exchange (1602, Amsterdam) was built to trade shares of…",
-    opts:[["The Dutch East India Company",1],["A gold mine",0],["The Bank of England",0],["A spice farm",0]],
-    why:"The VOC was the first company to sell shares to the public — inventing the stock market so ordinary people could own a slice of a business." },
-  { q:"Gold is priced per OUNCE, not per pound, because…",
-    opts:[["It uses the 'troy ounce', an ancient precious-metal weight",1],["Gold is too light to weigh in pounds",0],["Dollars only work in ounces",0],["It's a modern marketing choice",0]],
-    why:"Precious metals use the troy ounce (~31.1g), a standard from medieval trade fairs in Troyes, France." },
+    why:"Lydia, in modern Turkey, minted the first standardized coins from electrum. Standard weights meant trade no longer required weighing metal every time." },
+  { q:"Nvidia became the world's most valuable company on the strength of what business?",
+    opts:[["AI data-center chips",1],["Gaming consoles",0],["Crypto-mining hardware",0],["Smartphone processors",0]],
+    why:"The AI boom made Nvidia's data-center GPUs the scarcest input in technology — the picks and shovels of the gold rush, with demand outrunning supply for years." },
+  { q:"What makes wheat or crude oil a 'commodity'?",
+    opts:[["Any unit is interchangeable with any other",1],["The price always rises over time",0],["Only governments may trade it",0],["It never expires",0]],
+    why:"Commodities are fungible: one barrel of same-grade oil equals any other, so the market trades purely on price rather than brand." },
+  { q:"The first modern stock exchange, Amsterdam 1602, existed to trade shares of what?",
+    opts:[["The Dutch East India Company",1],["A gold mine",0],["The Bank of England",0],["A spice plantation",0]],
+    why:"The Dutch East India Company was the first to sell shares to the public — inventing the stock market so ordinary people could own a slice of a business." },
+  { q:"Why is gold priced per ounce rather than per pound?",
+    opts:[["It uses the troy ounce, an old precious-metal standard",1],["Gold is too light to weigh in pounds",0],["US law requires it",0],["A modern marketing convention",0]],
+    why:"Precious metals trade in troy ounces (about 31.1 grams), a standard that survives from medieval European trade fairs." },
+  { q:"Crude oil earned which nickname as fortunes were built on it?",
+    opts:[["Black gold",1],["Liquid steel",0],["Dark diamond",0],["Earth's blood",0]],
+    why:"'Black gold' — control of oil built several of history's largest fortunes and redrew global power in the twentieth century." },
 ];
 
-// ---------------- FUTURE: commodity thesis → name a company ----------------
 const FUTURE=[
-  { q:"Solar keeps scaling and electricity gets ~30% cheaper by 2030. Which company cashes in?",
-    hint:"Think: who burns HUGE amounts of power to make their product?",
+  { q:"Solar keeps scaling and electricity gets about 30% cheaper by 2030. Which company benefits most?",
+    hint:"Think about who consumes enormous amounts of power to make their product.",
     model:{tkr:"TSLA",name:"Tesla"}, picks:["TSLA","MSFT","NVDA"],
-    why:"Cheaper power lowers EV charging + Tesla's energy-storage costs. AI data-center operators (MSFT, GOOGL, NVDA-powered) win big on electricity bills too." },
-  { q:"Liquid cooling slashes water use in AI data centers. Which company rides that?",
-    hint:"Someone SELLS the cooling and power gear.",
+    why:"Cheaper power lowers EV charging costs and improves the economics of Tesla's storage business. Data-center operators win on their largest utility bill too." },
+  { q:"Liquid cooling sharply cuts water use in AI data centers. Who rides that shift?",
+    hint:"Someone sells the cooling and power equipment.",
     model:{tkr:"VRT",name:"Vertiv"}, picks:["VRT","NVDA","MSFT"],
-    why:"Vertiv makes data-center cooling + power — a direct 'picks and shovels' play. Nvidia/Microsoft also win from cheaper, denser compute." },
-  { q:"Lithium prices fall 40% by 2030 as supply floods in. Who benefits?",
-    hint:"Cheaper batteries help whoever BUYS the most of them.",
+    why:"Vertiv sells data-center cooling and power infrastructure — a direct picks-and-shovels play on the buildout." },
+  { q:"Lithium prices fall 40% by 2030 as new supply arrives. Who benefits?",
+    hint:"Cheaper batteries help whoever buys the most of them.",
     model:{tkr:"TSLA",name:"Tesla"}, picks:["TSLA","GM","RIVN"],
-    why:"Batteries are ~a third of an EV's cost — cheaper lithium fattens margins for EV makers like Tesla and BYD." },
-  { q:"Nuclear restarts push uranium demand up. Name a beneficiary.",
+    why:"Batteries are roughly a third of an EV's cost. Cheaper lithium flows straight into EV-maker margins." },
+  { q:"Nuclear restarts push uranium demand up through 2030. Name a beneficiary.",
     hint:"Who digs it out of the ground?",
     model:{tkr:"CCJ",name:"Cameco"}, picks:["CCJ","CEG","NVDA"],
-    why:"Cameco is a top uranium miner — rising demand + tight supply lifts the whole fuel chain." },
-  { q:"AI doubles US data-center electricity demand by 2030. Which power company wins?",
-    hint:"Always-on, clean baseload power is the prize.",
+    why:"Cameco is one of the largest uranium miners; rising demand against tight supply lifts the whole fuel chain." },
+  { q:"AI roughly doubles US data-center electricity demand by 2030. Which power company wins?",
+    hint:"Always-on, carbon-free baseload is the prize.",
     model:{tkr:"CEG",name:"Constellation Energy"}, picks:["CEG","VST","NEE"],
-    why:"Constellation runs the largest US nuclear fleet — exactly the 24/7 clean power AI data centers are signing deals for." },
-  { q:"Everything electrifies and copper runs short. Who benefits?",
-    hint:"Copper has to be MINED.",
+    why:"Constellation operates the largest US nuclear fleet — exactly the around-the-clock clean power that AI operators are signing long-term deals for." },
+  { q:"Everything electrifies and copper runs structurally short. Who benefits?",
+    hint:"Copper has to be mined.",
     model:{tkr:"FCX",name:"Freeport-McMoRan"}, picks:["FCX","SCCO","TSLA"],
-    why:"Freeport is a copper-mining giant — EVs, grids and data centers all need far more copper than supply can meet." },
-  { q:"GLP-1 weight-loss drugs keep booming. Name the company.",
-    hint:"Two names own the shots.",
+    why:"Freeport is a copper-mining giant. EVs, grids, and data centers all need far more copper than current supply provides." },
+  { q:"GLP-1 weight-loss drugs keep growing through 2030. Name the company.",
+    hint:"Two firms dominate the category.",
     model:{tkr:"LLY",name:"Eli Lilly"}, picks:["LLY","NVO","PFE"],
-    why:"Eli Lilly (Zepbound) and Novo Nordisk (Ozempic/Wegovy) own the GLP-1 wave — one of the biggest drug launches ever." },
-  { q:"Robotaxis go mainstream by 2030. Which company wins the streets?",
-    hint:"One makes cars; one makes the software driving them.",
-    model:{tkr:"GOOGL",name:"Alphabet (Waymo)"}, picks:["GOOGL","TSLA","UBER"],
-    why:"Alphabet's Waymo leads real driverless miles today; Tesla is the high-risk, high-reward bet on scaling its fleet." },
-  { q:"Bad harvests send cocoa prices to records. Which snack giant gets squeezed?",
-    hint:"This is a SHORT thesis — who PAYS more for the beans?",
+    why:"Eli Lilly and Novo Nordisk own the GLP-1 category — among the largest drug launches in history." },
+  { q:"Robotaxis reach mainstream scale by 2030. Who wins the streets?",
+    hint:"One company makes cars; another makes the software that drives them.",
+    model:{tkr:"GOOGL",name:"Alphabet"}, picks:["GOOGL","TSLA","UBER"],
+    why:"Alphabet's Waymo leads real driverless miles today. Tesla is the higher-risk bet on converting its fleet with software." },
+  { q:"Poor harvests send cocoa to record prices. Which snack giant gets squeezed?",
+    hint:"This one is inverted — who has to pay more for beans?",
     model:{tkr:"HSY",name:"Hershey"}, picks:["HSY","MDLZ","SBUX"],
-    why:"Cocoa is Hershey's key input — spiking prices squeeze margins. Spotting INPUT costs is half of investing." },
-  { q:"AI + LNG exports push natural-gas demand up. Name a beneficiary.",
+    why:"Cocoa is Hershey's key input, so record prices compress its margins. Spotting input costs is half of investing." },
+  { q:"AI demand plus LNG exports push natural gas consumption up. Name a beneficiary.",
     hint:"Who ships it overseas?",
     model:{tkr:"LNG",name:"Cheniere Energy"}, picks:["LNG","XOM","CVX"],
-    why:"Cheniere is the largest US LNG exporter — more global demand flows straight through its terminals." },
+    why:"Cheniere is the largest US LNG exporter; growing global demand flows directly through its terminals." },
 ];
 
-// ---------------- PRESENT: live calls that settle at close ----------------
 const PRESENT_UNIVERSE=[
   {tkr:"NVDA",name:"Nvidia"},{tkr:"AAPL",name:"Apple"},{tkr:"TSLA",name:"Tesla"},{tkr:"AMZN",name:"Amazon"},
   {tkr:"META",name:"Meta"},{tkr:"SPOT",name:"Spotify"},{tkr:"NFLX",name:"Netflix"},{tkr:"AMD",name:"AMD"},
   {tkr:"COIN",name:"Coinbase"},{tkr:"HOOD",name:"Robinhood"},{tkr:"DIS",name:"Disney"},{tkr:"UBER",name:"Uber"},
-  {tkr:"CMG",name:"Chipotle"},{tkr:"GOOGL",name:"Google"},{tkr:"SBUX",name:"Starbucks"},{tkr:"NKE",name:"Nike"},
+  {tkr:"CMG",name:"Chipotle"},{tkr:"GOOGL",name:"Alphabet"},{tkr:"SBUX",name:"Starbucks"},{tkr:"NKE",name:"Nike"},
 ];
 
-let DECK=[]; let idx=0; const picks=[]; let awaiting=false; const hintUsed=[];
+/* ---------------- state ---------------- */
+let DECK=[], idx=0, results=[];
 
-async function detectApi(){
-  try{ const r=await fetch('/api/health'); if(r.ok){const j=await r.json(); API.on=!!j.ok;} }catch(e){ API.on=false; }
-  const el=$('#live');
-  if(API.on){ el.classList.add('on'); $('#liveTxt').textContent='LIVE data'; }
-  else { $('#liveTxt').textContent='preview'; }
-}
-
-function buildPresent(n){
-  const u=shuffle(PRESENT_UNIVERSE); const out=[];
-  for(let i=0;i<n;i++){
-    if(Math.random()<0.5){
-      out.push({type:'present',variant:'green',tkr:u[i].tkr,name:u[i].name,q:`Will ${u[i].name} (${u[i].tkr}) close GREEN today?`});
-    } else {
-      const a=u[i%u.length], b=u[(i+3)%u.length];
-      out.push({type:'present',variant:'vs',a,b,q:`Who's up more today — ${a.name} or ${b.name}?`});
-    }
-  }
-  return out;
-}
-function buildDeck(){
-  const past=shuffle(PAST).slice(0,3).map(x=>({type:'past',...x}));
-  const fut=shuffle(FUTURE).slice(0,2).map(x=>({type:'future',...x}));
-  const present = API.on ? buildPresent(2) : shuffle(FUTURE).slice(2,3).map(x=>({type:'future',...x}));
-  // if offline, backfill the "present" slot with an extra future so the deck stays full & interactive
-  DECK = shuffle([...past,...fut,...present]).slice(0,6);
-}
-
-function buildProg(){ $('#prog').innerHTML=''; DECK.forEach(()=>{const i=document.createElement('i');$('#prog').appendChild(i);}); }
-function paintProg(){[...$('#prog').children].forEach((el,i)=>{el.className=i<idx?'done':(i===idx?'cur':'')})}
-
-function head(m){
-  const map={past:['past','🏛️ History of value','settle a real fact'],
-    present:['present','🔴 Today','settles at 4pm ET'],
-    future:['future','🔮 2030 thesis','name your pick']};
-  const [cls,label,tag]=map[m.type];
-  const timer = m.type==='present'
-    ? `<span class="timer">⏳ closes in <span class="countdown">…</span></span>`
-    : `<span class="timer">${tag}</span>`;
-  return `<div class="kind"><span class="k ${cls}">${label}</span>${timer}${m.hint?`<button class="hintBtn" data-hint>💡 Hint</button>`:''}</div>
-    ${m.q?`<div class="q">${m.q}</div>`:''}${m.hint?`<div class="hintbox" data-box>💡 ${m.hint}</div>`:''}`;
-}
-
-// ---- countdown to US market close (4pm ET) ----
+/* ---------------- market clock ---------------- */
 function msToClose(){
   const now=new Date();
   const et=new Date(now.toLocaleString('en-US',{timeZone:'America/New_York'}));
@@ -330,202 +376,263 @@ function msToClose(){
   while(close.getDay()===0||close.getDay()===6) close.setDate(close.getDate()+1);
   return close-et;
 }
-function fmtDur(ms){ if(ms<=0)return'now'; const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;
-  return h>0?`${h}h ${m}m`:`${m}m ${ss}s`; }
-function tickClock(){ const t=fmtDur(msToClose()); document.querySelectorAll('.countdown').forEach(el=>el.textContent=t); }
-function tail(){ return `<div class="verdict" data-verdict></div><div class="nextRow" data-nextrow><button class="nextBtn" data-next>Next →</button></div>`; }
+function fmtDur(ms){ if(ms<=0)return'now'; const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60);
+  return h>0?`${h}h ${m}m`:`${m}m`; }
+function tickClock(){
+  const t=fmtDur(msToClose());
+  document.querySelectorAll('.countdown').forEach(el=>el.textContent=t);
+  $('#clockNote').textContent=`market close in ${t}`;
+}
 
-function cardInner(m){
+/* ---------------- api ---------------- */
+async function detectApi(){
+  try{const r=await fetch('/api/health');if(r.ok){const j=await r.json();API.on=!!j.ok;}}catch(e){API.on=false;}
+  const el=$('#status');
+  if(API.on){el.classList.add('on');$('#statusTxt').textContent='live data';}
+  else $('#statusTxt').textContent='offline preview';
+}
+
+/* ---------------- deck build ---------------- */
+function buildDeck(){
+  const past=shuffle(PAST).slice(0,3).map(x=>({type:'past',...x}));
+  const fut=shuffle(FUTURE).slice(0,2).map(x=>({type:'future',...x}));
+  let present=[];
+  if(API.on){
+    const u=shuffle(PRESENT_UNIVERSE);
+    present=[Math.random()<0.5
+      ? {type:'present',variant:'close',tkr:u[0].tkr,name:u[0].name,q:`Will ${u[0].name} close higher today?`}
+      : {type:'present',variant:'vs',a:u[0],b:u[3],q:`Which is up more today — ${u[0].name} or ${u[3].name}?`}];
+  } else {
+    present=shuffle(FUTURE).slice(2,3).map(x=>({type:'future',...x}));
+  }
+  DECK=shuffle([...past,...fut,...present]);
+  idx=0; results=[];
+}
+
+/* ---------------- views ---------------- */
+function show(view){
+  ['landing','deckView','summaryView','calcView'].forEach(id=>$('#'+id).classList.add('hidden'));
+  $('#'+view).classList.remove('hidden');
+  window.scrollTo({top:0});
+}
+
+/* ---------------- card rendering ---------------- */
+const TYPE_META={
+  past:{label:'Past · history of value',cls:'past',aux:''},
+  present:{label:'Today · live call',cls:'present',aux:'settles at close, <span class="countdown mono"></span> to go'},
+  future:{label:'Future · 2030 thesis',cls:'future',aux:'no wrong answer — defend your pick'},
+};
+
+function renderCard(){
+  const m=DECK[idx];
+  $('#qNum').textContent=idx+1; $('#qTotal').textContent=DECK.length;
+  $('#barFill').style.width=((idx)/DECK.length*100)+'%';
+  const t=TYPE_META[m.type];
+  const mount=$('#cardMount');
+  const hintBtn=m.hint?`<button class="textbtn hintlink" data-hint>Show hint</button>`:'';
+  let body='';
   if(m.type==='past'){
-    const opts=m._shuffledOpts || (m._shuffledOpts=shuffle(m.opts));
-    return head(m)+`<div class="options">${opts.map((o,i)=>
-      `<button class="optbtn" data-opt="${i}"><span class="mk">${String.fromCharCode(65+i)}</span><span>${o[0]}</span></button>`).join('')}</div>`+tail();
+    const opts=m._s||(m._s=shuffle(m.opts));
+    body=`<div class="choices">${opts.map((o,i)=>
+      `<button class="choice" data-opt="${i}"><span class="key">${String.fromCharCode(65+i)}</span><span>${o[0]}</span></button>`).join('')}</div>`;
+  } else if(m.type==='present'){
+    body = m.variant==='close'
+      ? `<div class="pair">
+          <button class="choice" data-choice="green"><span class="big">Closes higher</span><span class="sub">green day</span></button>
+          <button class="choice" data-choice="red"><span class="big">Closes lower</span><span class="sub">red day</span></button></div>`
+      : `<div class="pair">
+          <button class="choice" data-choice="a"><span class="big">${m.a.name}</span><span class="sub mono">${m.a.tkr}</span></button>
+          <button class="choice" data-choice="b"><span class="big">${m.b.name}</span><span class="sub mono">${m.b.tkr}</span></button></div>`;
+  } else {
+    body=`<div class="thesis">
+      <label for="thesisInput">Your pick — company ticker</label>
+      <div class="row">
+        <input id="thesisInput" placeholder="e.g. TSLA" maxlength="6" autocomplete="off" spellcheck="false"/>
+        <button class="btn" data-lock>Lock it in</button>
+      </div>
+      <div class="suggest"><span>Ideas:</span>${(m.picks||[]).map(p=>`<button class="tickchip" data-chip="${p}">${p}</button>`).join('')}</div>
+    </div>`;
   }
-  if(m.type==='present'){
-    if(m.variant==='green'){
-      return head(m)+`<div class="single"><div class="opt" data-choice="green"><div class="em">🟢</div><div class="ol">Green</div><div class="od">closes up</div></div>
-        <div class="opt" data-choice="red"><div class="em">🔴</div><div class="ol">Red</div><div class="od">closes down</div></div></div>`+tail();
-    }
-    return head(m)+`<div class="duo"><div class="opt" data-choice="a"><div class="ol">${m.a.name}</div><div class="od mono">${m.a.tkr}</div></div>
-        <div class="opt" data-choice="b"><div class="ol">${m.b.name}</div><div class="od mono">${m.b.tkr}</div></div></div>`+tail();
+  mount.innerHTML=`<div class="qcard">
+    <div class="meta"><span class="cardtype ${t.cls}">${t.label}</span><span class="aux">${t.aux}</span>${hintBtn}</div>
+    <h2 class="question">${m.q}</h2>
+    ${m.hint?`<p class="hinttext" data-hinttext>${m.hint}</p>`:''}
+    ${body}
+    <div class="verdict" data-verdict></div>
+    <div class="nextrow" data-nextrow><button class="btn" data-next>${idx+1<DECK.length?'Next question':'Finish deck'}</button></div>
+  </div>`;
+  tickClock();
+
+  const hb=mount.querySelector('[data-hint]');
+  if(hb) hb.addEventListener('click',()=>{mount.querySelector('[data-hinttext]').classList.add('show');hb.remove();});
+  mount.querySelectorAll('[data-opt]').forEach(el=>el.addEventListener('click',()=>answerPast(+el.dataset.opt)));
+  mount.querySelectorAll('[data-choice]').forEach(el=>el.addEventListener('click',()=>answerPresent(el.dataset.choice)));
+  const lock=mount.querySelector('[data-lock]');
+  if(lock){
+    const inp=mount.querySelector('#thesisInput');
+    lock.addEventListener('click',()=>answerFuture(inp.value));
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')answerFuture(inp.value);});
+    mount.querySelectorAll('[data-chip]').forEach(ch=>ch.addEventListener('click',()=>{inp.value=ch.dataset.chip;}));
   }
-  if(m.type==='future'){
-    return head(m)+`<div class="thesis">
-      <div class="row"><input data-tkr placeholder="TYPE A TICKER — e.g. TSLA" maxlength="6" autocomplete="off" spellcheck="false"/>
-        <button class="go" data-go>Call it</button></div>
-      <div class="pickchips">${(m.picks||[]).map(p=>`<span class="pchip" data-pchip="${p}">${p}</span>`).join('')}
-        <span class="pchip" data-pchip="?">something else…</span></div>
-    </div>`+tail();
-  }
-  return head(m);
+  mount.querySelector('[data-next]').addEventListener('click',advance);
 }
 
-function makeCard(m,i){
-  const c=document.createElement('div'); c.className='card'; c.dataset.i=i; c.innerHTML=cardInner(m);
-  const hb=c.querySelector('[data-hint]'); if(hb){const box=c.querySelector('[data-box]');
-    hb.addEventListener('click',()=>{box.classList.add('show');hb.textContent='💡 used';hb.style.opacity=.5;hintUsed[i]=true;});}
-  c.querySelectorAll('[data-opt]').forEach(el=>el.addEventListener('click',()=>answerPast(c,i,+el.dataset.opt)));
-  c.querySelectorAll('[data-choice]').forEach(el=>el.addEventListener('click',()=>answerPresent(c,i,el.dataset.choice)));
-  const go=c.querySelector('[data-go]'); if(go){const inp=c.querySelector('[data-tkr]');
-    go.addEventListener('click',()=>answerFuture(c,i,inp.value));
-    inp.addEventListener('keydown',e=>{if(e.key==='Enter')answerFuture(c,i,inp.value);});
-    c.querySelectorAll('[data-pchip]').forEach(ch=>ch.addEventListener('click',()=>{ if(ch.dataset.pchip==='?'){inp.focus();return;} inp.value=ch.dataset.pchip; answerFuture(c,i,ch.dataset.pchip);}));}
-  const nb=c.querySelector('[data-next]'); nb.addEventListener('click',()=>advance(c));
-  return c;
+function showVerdict(cls,lead,bodyHtml){
+  const v=$('#cardMount').querySelector('[data-verdict]');
+  v.className='verdict show '+cls;
+  v.innerHTML=`<p class="lead">${lead}</p><div class="body">${bodyHtml}</div>`;
+  $('#cardMount').querySelector('[data-nextrow]').classList.add('show');
+  return v;
 }
-function render(){
-  $('#deck').innerHTML='';
-  if(idx>=DECK.length){ results(); return; }
-  awaiting=false;
-  const card=makeCard(DECK[idx],idx); card.style.zIndex=2; $('#deck').appendChild(card);
-  paintProg(); tickClock(); $('#undoBtn').style.visibility=idx>0?'visible':'hidden';
-}
-function showNext(card){ card.querySelector('[data-nextrow]').classList.add('show');
-  card.scrollTo({top:card.scrollHeight,behavior:'smooth'}); }
-function advance(card){ awaiting=false;
-  card.style.transition='transform .34s cubic-bezier(.4,0,.2,1),opacity .34s';
-  card.style.transform='translateY(-42px) scale(.94)'; card.style.opacity=0;
-  setTimeout(()=>{idx++;render();},200);
+function advance(){
+  idx++;
+  if(idx>=DECK.length) renderSummary(); else renderCard();
 }
 
-// ---- PAST: real right/wrong ----
-function answerPast(card,i,choiceIdx){
-  if(awaiting) return; awaiting=true;
-  const m=DECK[i]; const opts=m._shuffledOpts;
-  const correctIdx=opts.findIndex(o=>o[1]===1);
-  const hit=choiceIdx===correctIdx;
-  picks[i]={type:'past',hit};
-  card.querySelectorAll('[data-opt]').forEach((el,k)=>{el.style.pointerEvents='none';
-    if(k===correctIdx) el.classList.add('correct'); else if(k===choiceIdx) el.classList.add('wrong');});
-  const v=card.querySelector('[data-verdict]'); v.className='verdict show '+(hit?'hit':'miss');
-  v.innerHTML=`<div class="vh">${hit?'✅ Called it.':'❌ Not quite — the answer is '+opts[correctIdx][0]+'.'}</div>
-    <div>${m.why}</div><span class="src">🏛️ verified fact</span>`;
-  showNext(card);
+/* ---------------- answers ---------------- */
+function answerPast(i){
+  const m=DECK[idx], opts=m._s;
+  const correct=opts.findIndex(o=>o[1]===1);
+  const hit=i===correct;
+  results.push({type:'past',hit});
+  const mount=$('#cardMount');
+  mount.querySelectorAll('[data-opt]').forEach((el,k)=>{
+    el.disabled=true;
+    if(k===correct)el.classList.add('correct');
+    else if(k===i)el.classList.add('wrong');
+  });
+  showVerdict(hit?'good':'bad',
+    hit?'Correct.':`Not quite — the answer is “${opts[correct][0]}.”`,
+    m.why);
 }
 
-// ---- PRESENT: live standing, settles at close (surprise) ----
-async function answerPresent(card,i,choice){
-  if(awaiting) return; awaiting=true;
-  const m=DECK[i]; picks[i]={type:'present',choice};
-  card.querySelectorAll('[data-choice]').forEach(el=>{el.style.pointerEvents='none';if(el.dataset.choice===choice)el.classList.add('pick');});
-  const v=card.querySelector('[data-verdict]'); v.className='verdict show wait';
-  v.innerHTML=`<div class="vh">🔒 Locked.</div><div>Settles at market close — <b>⏳ <span class="countdown">…</span></b> to go. Come back to see if you called it.</div>`;
-  tickClock(); showNext(card);
-  if(!API.on){ v.querySelector('.vh').insertAdjacentHTML('afterend','<div class="liveline" style="color:var(--muted)">run the live server to see the real-time standing.</div>'); return; }
+async function answerPresent(choice){
+  const m=DECK[idx];
+  results.push({type:'present',choice});
+  const mount=$('#cardMount');
+  mount.querySelectorAll('[data-choice]').forEach(el=>{
+    el.disabled=true;
+    if(el.dataset.choice===choice)el.classList.add('picked');
+  });
+  const v=showVerdict('neutral','Locked in.',
+    `This settles at market close — <span class="countdown mono"></span> from now. Come back after 4:00pm ET for the result.`);
+  tickClock();
+  if(!API.on) return;
   try{
-    const tickers = m.variant==='green' ? m.tkr : `${m.a.tkr},${m.b.tkr}`;
+    const tickers=m.variant==='close'?m.tkr:`${m.a.tkr},${m.b.tkr}`;
     const j=await fetch('/api/live?tickers='+tickers).then(r=>r.json());
-    if(m.variant==='green'){
-      const q=j.results[m.tkr]; if(!q||!q.valid) return;
+    let line='';
+    if(m.variant==='close'){
+      const q=j.results[m.tkr]; if(!q||!q.valid)return;
       const leading=(q.changePct>=0)===(choice==='green');
-      v.querySelector('.vh').insertAdjacentHTML('afterend',
-        `<div class="liveline ${q.changePct>=0?'up':'down'}">${m.tkr} ${pct(q.changePct)} right now — you're currently ${leading?'🟢 winning':'🔴 losing'}.</div>`);
+      line=`${m.tkr} is <span class="${q.changePct>=0?'up':'down'}">${pct(q.changePct)}</span> right now — your call is ${leading?'ahead':'behind'}.`;
     } else {
-      const qa=j.results[m.a.tkr], qb=j.results[m.b.tkr]; if(!qa||!qb||!qa.valid||!qb.valid) return;
-      const leader = qa.changePct>=qb.changePct?'a':'b';
-      v.querySelector('.vh').insertAdjacentHTML('afterend',
-        `<div class="liveline">${m.a.tkr} ${pct(qa.changePct)} · ${m.b.tkr} ${pct(qb.changePct)} — you're currently ${leader===choice?'🟢 winning':'🔴 losing'}.</div>`);
+      const qa=j.results[m.a.tkr],qb=j.results[m.b.tkr]; if(!qa||!qb||!qa.valid||!qb.valid)return;
+      const leader=qa.changePct>=qb.changePct?'a':'b';
+      line=`${m.a.tkr} <span class="${qa.changePct>=0?'up':'down'}">${pct(qa.changePct)}</span> · ${m.b.tkr} <span class="${qb.changePct>=0?'up':'down'}">${pct(qb.changePct)}</span> — your call is ${leader===choice?'ahead':'behind'}.`;
     }
+    v.insertAdjacentHTML('beforeend',`<p class="datum mono">${line}</p>`);
   }catch(e){}
 }
 
-// ---- FUTURE: name a company, validate live, reveal model answer + "put $X on it" ----
-async function answerFuture(card,i,raw){
-  if(awaiting) return; const val=(raw||'').trim().toUpperCase().replace(/[^A-Z.]/g,'');
-  if(!val) return; awaiting=true;
-  const m=DECK[i]; picks[i]={type:'future',pick:val};
-  // disable ONLY the thesis controls — never the Next button
-  card.querySelectorAll('.thesis input, .thesis .go, .thesis .pchip').forEach(el=>{el.style.pointerEvents='none';el.style.opacity=.55;});
-  const v=card.querySelector('[data-verdict]'); v.className='verdict show info';
-  v.innerHTML=`<div class="vh">🔮 Thesis locked.</div>
-    <div class="liveline">Your pick: <b>${val}</b> — logged as your thesis.</div>
-    <div style="margin-top:6px">A commonly-cited winner here is <b>${m.model.tkr}</b> (${m.model.name}). ${m.why}</div>
-    <div class="backit">
-      <span class="bl">Believe it? Put real money on ${val} 💸</span>
-      <div class="brow"><input data-amt inputmode="decimal" placeholder="$100"/><button class="go" data-back>Back it</button></div>
-      <div data-backout></div>
-    </div>
-    <span class="src">🔮 the future has no 'right' answer — defend yours</span>`;
-  showNext(card);
+async function answerFuture(raw){
+  const val=(raw||'').trim().toUpperCase().replace(/[^A-Z.]/g,'');
+  if(!val)return;
+  const m=DECK[idx];
+  const rec={type:'future',pick:val}; results.push(rec);
+  const mount=$('#cardMount');
+  mount.querySelectorAll('.thesis input,.thesis .btn,.tickchip').forEach(el=>el.disabled=true);
+  const v=showVerdict('neutral',`Thesis locked: ${val}.`,
+    `${m.why}<br/><br/>A commonly cited answer here is <strong>${m.model.tkr}</strong> (${m.model.name}) — but the future has no answer key. Yours is logged.`);
   let price=null;
   if(API.on){
-    try{ const j=await fetch('/api/live?tickers='+val).then(r=>r.json()); const q=j.results[val];
-      if(q&&q.valid){ price=q.price;
-        v.querySelector('.liveline').innerHTML=`Your pick: <b>${val}</b> — ✅ real ticker (${q.name}), ${pct(q.changePct)} today.`;
+    try{
+      const j=await fetch('/api/live?tickers='+val).then(r=>r.json());
+      const q=j.results[val];
+      if(q&&q.valid){price=q.price;
+        v.insertAdjacentHTML('beforeend',`<p class="datum mono">${val} · ${q.name} · ${money(q.price)} · <span class="${q.changePct>=0?'up':'down'}">${pct(q.changePct)}</span> today</p>`);
       } else {
-        v.querySelector('.liveline').innerHTML=`Your pick: <b>${val}</b> — ⚠️ couldn't find that ticker, double-check the symbol. Logged anyway.`;
+        v.insertAdjacentHTML('beforeend',`<p class="datum">That ticker didn't match a listed company — check the symbol next time. Your pick is still logged.</p>`);
       }
     }catch(e){}
   }
-  const backBtn=v.querySelector('[data-back]'), amtInp=v.querySelector('[data-amt]'), backOut=v.querySelector('[data-backout]');
-  async function doBack(){
-    const amt=parseFloat((amtInp.value||'').replace(/[^0-9.]/g,''))||100;
-    let px=price;
-    if(px==null && API.on){ try{const j=await fetch('/api/live?tickers='+val).then(r=>r.json());const q=j.results[val];if(q&&q.valid)px=q.price;}catch(e){} }
-    if(px==null){ backOut.innerHTML=`<div class="bnote">Couldn't price ${val} — the live server is needed to back a pick.</div>`; return; }
-    const shares=amt/px; picks[i].backed={amt,shares,px};
-    backOut.innerHTML=`<div class="backed">💸 Backing <b>${val}</b>: $${amt.toFixed(0)} → <b>${shares.toFixed(2)} shares</b> @ $${px.toFixed(2)}. We'll track this thesis for you.</div>`;
-    backBtn.textContent='Backed ✓'; backBtn.style.pointerEvents='none'; backBtn.style.opacity=.55; amtInp.style.pointerEvents='none';
+  if(price!=null){
+    v.insertAdjacentHTML('beforeend',`<div class="backit">
+      <p class="bl">Believe it? Back ${val} with a position.</p>
+      <div class="row"><input data-amt inputmode="decimal" placeholder="$100"/><button class="btn" data-back>Back it</button></div>
+      <p class="backnote" data-backout></p></div>`);
+    const btn=v.querySelector('[data-back]'),amt=v.querySelector('[data-amt]'),out=v.querySelector('[data-backout]');
+    const doBack=()=>{
+      const a=parseFloat((amt.value||'').replace(/[^0-9.]/g,''))||100;
+      const shares=a/price;
+      rec.backed={amount:a,shares,price};
+      out.innerHTML=`Backed: ${money(a)} → <strong class="mono">${shares.toFixed(2)} shares</strong> at ${money(price)}. We'll track this thesis.`;
+      btn.disabled=true;btn.textContent='Backed';amt.disabled=true;
+    };
+    btn.addEventListener('click',doBack);
+    amt.addEventListener('keydown',e=>{if(e.key==='Enter')doBack();});
   }
-  backBtn.addEventListener('click',doBack);
-  amtInp.addEventListener('keydown',e=>{if(e.key==='Enter')doBack();});
 }
 
-$('#undoBtn').addEventListener('click',()=>{if(idx===0)return;idx--;picks[idx]=undefined;render();});
-
-function results(){
-  const pastRows=picks.filter(p=>p&&p.type==='past'); const pastRight=pastRows.filter(p=>p.hit).length;
-  const present=picks.filter(p=>p&&p.type==='present').length;
-  const future=picks.filter(p=>p&&p.type==='future').length;
-  const board=[{nm:'🤖 The Algo',sc:Math.min(pastRows.length,2)},{nm:'Maya',sc:pastRows.length},{nm:'You',sc:pastRight,me:true},{nm:'Arjun',sc:Math.max(0,pastRight-1)}]
-    .sort((a,b)=>b.sc-a.sc);
-  $('#deck').innerHTML=''; $('#actions').classList.add('hidden'); $('#hint').classList.add('hidden'); $('#prog').classList.add('hidden');
-  $('#sub').textContent="Here's your run 👇";
-  const s=document.createElement('div'); s.className='screen';
-  s.innerHTML=`<div class="scoreCard"><div class="lbl">Mudd Money · today</div>
-    <div class="big">${pastRight}/${pastRows.length} history called</div>
-    <div class="rsum"><div>🔴 ${present} live call${present===1?'':'s'} — settle at close</div><div>🔮 ${future} thesis logged</div></div></div>
-    <div style="margin:16px 0 4px;font-weight:800">Knowledge leaderboard</div>
-    ${board.map((r,i)=>`<div class="lbrow ${r.me?'me':''}"><span class="rk">${i+1}</span><span class="nm">${r.nm}</span><span class="sc mono">${r.sc}/${pastRows.length||1}</span></div>`).join('')}
-    <button class="calc" style="margin-top:16px" onclick="location.reload()">New deck ↺</button>`;
-  $('#deck').style.flex='none'; $('#deck').appendChild(s);
+/* ---------------- summary ---------------- */
+function renderSummary(){
+  const past=results.filter(r=>r.type==='past');
+  const right=past.filter(r=>r.hit).length;
+  const present=results.filter(r=>r.type==='present').length;
+  const theses=results.filter(r=>r.type==='future');
+  const backed=theses.filter(t=>t.backed);
+  $('#summaryBody').innerHTML=`
+    <p class="score serif">${right} of ${past.length} history calls correct.</p>
+    <div class="sumlines">
+      <div class="sumline"><span class="l">History of value</span><span class="v mono">${right}/${past.length}</span></div>
+      ${present?`<div class="sumline"><span class="l">Live calls awaiting close</span><span class="v mono">${present}</span></div>`:''}
+      <div class="sumline"><span class="l">Theses logged</span><span class="v mono">${theses.map(t=>t.pick).join(', ')||'—'}</span></div>
+      ${backed.length?`<div class="sumline"><span class="l">Positions backed</span><span class="v mono">${backed.map(t=>`${t.pick} ${money(t.backed.amount)}`).join(' · ')}</span></div>`:''}
+    </div>`;
+  show('summaryView');
+  $('#barFill').style.width='100%';
 }
 
-// ---------- tabs ----------
-document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
-  const play=t.dataset.tab==='play'; $('#playView').classList.toggle('hidden',!play); $('#labView').classList.toggle('hidden',play);
-}));
-
-// ---------- Position Lab ----------
-['NVDA','SPOT','LULU','CMG','AAPL','UBER'].forEach(t=>{const c=document.createElement('span');c.className='chip';c.textContent=t;
-  c.addEventListener('click',()=>{$('#fTicker').value=t;});$('#chips').appendChild(c);});
-(function(){const d=new Date();d.setFullYear(d.getFullYear()-1);$('#fDate').value=d.toISOString().slice(0,10);})();
-$('#calcBtn').addEventListener('click',calcPosition);
+/* ---------------- calculator ---------------- */
 async function calcPosition(){
-  const ticker=$('#fTicker').value.trim().toUpperCase(); const amount=parseFloat($('#fAmount').value)||100; const from=$('#fDate').value;
-  const out=$('#out'); out.classList.add('show'); out.innerHTML='crunching real prices…';
-  if(!API.on){ out.innerHTML=`<div style="font-weight:700">Live engine not running</div>
-    <div class="betanote">The Position Lab needs real prices. Run <b>node server.js</b> → refresh.</div>`; return; }
+  const ticker=$('#fTicker').value.trim().toUpperCase();
+  const amount=parseFloat($('#fAmount').value)||100;
+  const from=$('#fDate').value;
+  const out=$('#calcResult');
+  out.classList.add('show'); out.innerHTML='<p class="note">Fetching real prices…</p>';
+  if(!API.on){out.innerHTML='<p class="note">The calculator needs the live server. Run <span class="mono">node server.js</span> and refresh.</p>';return;}
   try{
     const j=await fetch(`/api/position?ticker=${ticker}&amount=${amount}&from=${from}`).then(r=>r.json());
-    if(j.error){ out.innerHTML=`<div style="font-weight:700">Couldn't compute</div><div class="betanote">${j.error}</div>`; return; }
+    if(j.error){out.innerHTML=`<p class="note">${j.error}</p>`;return;}
     const gain=j.pnl>=0;
-    out.innerHTML=`<div class="lbl" style="font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--muted)">${ticker} · since ${j.entryDate}</div>
-      <div class="bignum ${gain?'up':'down'}">${money(j.value)} <span style="font-size:15px;color:var(--muted)">from ${money(j.invested)}</span></div>
-      <div style="font-weight:800" class="${gain?'up':'down'}">${gain?'▲':'▼'} ${money(j.pnl)} (${pct(j.returnPct)})</div>
-      <div class="grid2"><div class="stat"><div class="l">Beta vs SPY</div><div class="v">${j.beta.toFixed(2)}</div></div>
-        <div class="stat"><div class="l">Ann. volatility</div><div class="v">${(j.annualizedVol*100).toFixed(0)}%</div></div>
-        <div class="stat"><div class="l">Entry price</div><div class="v mono">$${j.entryPrice.toFixed(2)}</div></div>
-        <div class="stat"><div class="l">Last price</div><div class="v mono">$${j.lastPrice.toFixed(2)}</div></div></div>
-      <div class="betanote"><b>Beta ${j.beta.toFixed(2)}</b> means it moved about ${j.beta.toFixed(1)}× the market.
-      ${j.beta>1.15?'High-beta — more of your gain (and risk) is amplified market.':j.beta<0.85?'Defensive — it moved less than the market.':'Roughly in line with the market.'}
-      That's the OpenTrade beta lens: how much was the market vs. your call.</div>`;
-  }catch(e){ out.innerHTML=`<div style="font-weight:700">Network error</div><div class="betanote">${e.message}</div>`; }
+    out.innerHTML=`
+      <p class="headline serif">${money(j.value)}</p>
+      <p class="sub ${gain?'up':'down'}">${gain?'▲':'▼'} ${money(j.pnl)} (${pct(j.returnPct)}) on ${money(j.invested)} since ${j.entryDate}</p>
+      <div class="stats">
+        <div class="stat"><p class="l">Beta vs S&amp;P 500</p><p class="v mono">${j.beta.toFixed(2)}</p></div>
+        <div class="stat"><p class="l">Annualized volatility</p><p class="v mono">${(j.annualizedVol*100).toFixed(0)}%</p></div>
+        <div class="stat"><p class="l">Entry price</p><p class="v mono">${money(j.entryPrice)}</p></div>
+        <div class="stat"><p class="l">Last price</p><p class="v mono">${money(j.lastPrice)}</p></div>
+      </div>
+      <p class="note">A beta of ${j.beta.toFixed(2)} means this stock moved about ${j.beta.toFixed(1)}× the market.
+      ${j.beta>1.15?'More of the gain — and the risk — was amplified market movement.':j.beta<0.85?'It moved less than the market: a defensive holding.':'It tracked the market closely.'}
+      That split — market versus your call — is the honest way to read any return.</p>`;
+  }catch(e){out.innerHTML=`<p class="note">Network error: ${e.message}</p>`;}
 }
 
-async function init(){ await detectApi(); buildDeck(); buildProg(); render(); tickClock(); setInterval(tickClock,1000); }
-init();
+/* ---------------- wiring ---------------- */
+$('#startBtn').addEventListener('click',()=>{buildDeck();show('deckView');renderCard();});
+$('#againBtn').addEventListener('click',()=>{buildDeck();show('deckView');renderCard();});
+$('#quitBtn').addEventListener('click',()=>{results.length?renderSummary():show('landing');});
+$('#calcLink').addEventListener('click',()=>show('calcView'));
+$('#homeLink').addEventListener('click',e=>{e.preventDefault();show('landing');});
+$('#calcBtn').addEventListener('click',calcPosition);
+(function(){const d=new Date();d.setFullYear(d.getFullYear()-1);$('#fDate').value=d.toISOString().slice(0,10);})();
+
+(async function init(){
+  await detectApi();
+  tickClock(); setInterval(tickClock,30000);
+})();
 </script>
 </body>
 </html>
