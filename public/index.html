@@ -250,6 +250,7 @@
     <h1>You have $100.<br/>Now what?</h1>
     <p class="lede">Nobody teaches you this stuff. Called It does, five minutes a day. Real market prices, plain English, no jargon. You learn investing by calling it, not by reading a textbook.</p>
     <button class="btn" id="startBtn">Start today's deck</button>
+    <p class="aside" id="landingLobbyRow"><button class="textbtn" id="landingLobby">Playing with friends? Create a private lobby</button></p>
 
     <div class="how">
       <div class="how-row">
@@ -484,7 +485,7 @@ async function detectApi(){
   try{const r=await fetch('/api/health');if(r.ok){const j=await r.json();API.on=!!j.ok;}}catch(e){API.on=false;}
   const el=$('#status');
   if(API.on){el.classList.add('on');$('#statusTxt').textContent='live data';}
-  else $('#statusTxt').textContent='offline preview';
+  else{$('#statusTxt').textContent='offline preview';const r=$('#landingLobbyRow');if(r)r.classList.add('hidden');}
 }
 
 /* ---------------- deck build (deterministic from seed) ---------------- */
@@ -972,6 +973,26 @@ async function calcPosition(){
 
 /* ---------------- wiring ---------------- */
 $('#startBtn').addEventListener('click',startDeck);
+$('#landingLobby').addEventListener('click',async()=>{
+  const btn=$('#landingLobby');
+  try{
+    const j=await fetch('/api/lobby/create',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}).then(r=>r.json());
+    if(!j.code){btn.textContent='Could not create a lobby, try again';return;}
+    lobby={code:j.code,seed:j.seed};
+    battle=null;
+    let copied=false;
+    try{await navigator.clipboard.writeText(`Private deck battle, lobby ${j.code}. Same questions for everyone: ${lobbyLink(j.code)}`);copied=true;}catch(e){}
+    const banner=$('#resolveBanner');
+    banner.className='banner show good';
+    banner.innerHTML=`<p class="bl">Lobby ${j.code} is open.</p>
+      <p class="bb">${copied?'Invite link copied, send it to your friends.':'Send your friends this link:'}
+      <span class="mono">${lobbyLink(j.code)}</span></p>
+      <p class="bb">Everyone gets the same deck. Play yours, then post your score to the board.</p>`;
+    $('#startBtn').textContent='Play the lobby deck';
+    $('#landingLobbyRow').classList.add('hidden');
+    window.scrollTo({top:0});
+  }catch(e){btn.textContent='Could not create a lobby, try again';}
+});
 $('#againBtn').addEventListener('click',()=>{battle=null;buildDeck();show('deckView');renderCard();});
 $('#posPlayBtn').addEventListener('click',()=>{buildDeck();show('deckView');renderCard();});
 $('#quitBtn').addEventListener('click',()=>{results.length?renderSummary():show('landing');});
