@@ -203,6 +203,17 @@
   .stat .v{font-size:18px;font-weight:600;margin:2px 0 0}
   .note{margin-top:20px;font-size:14px;color:var(--muted);line-height:1.6;max-width:52ch}
 
+  /* ---------- resolution banner ---------- */
+  .banner{margin-top:24px;padding:18px 20px;border-radius:var(--r-card);background:var(--card);
+    border:1px solid var(--line);border-left:3px solid var(--line-strong);display:none;
+    animation:enter 300ms ease-out}
+  .banner.show{display:block}
+  .banner.good{border-left-color:var(--green)}
+  .banner.bad{border-left-color:var(--red)}
+  .banner .bl{font-weight:600;font-size:15px;margin:0}
+  .banner .bb{margin:4px 0 0;font-size:14px;color:var(--muted)}
+  .banner .dismiss{margin-top:10px}
+
   footer{margin-top:96px;padding-top:20px;border-top:1px solid var(--line);
     font-size:13px;color:var(--faint);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
@@ -230,6 +241,8 @@
       <span class="status" id="status"><i></i><span id="statusTxt">connecting</span></span>
     </nav>
   </header>
+
+  <div class="banner" id="resolveBanner"></div>
 
   <!-- LANDING -->
   <section id="landing" class="landing">
@@ -423,6 +436,8 @@ const store={
   set positions(v){ localStorage.setItem('ci_positions',JSON.stringify(v)); },
   get streak(){ try{return JSON.parse(localStorage.getItem('ci_streak')||'{"count":0,"last":""}');}catch(e){return{count:0,last:''};} },
   set streak(v){ localStorage.setItem('ci_streak',JSON.stringify(v)); },
+  get calls(){ try{return JSON.parse(localStorage.getItem('ci_calls')||'[]');}catch(e){return[];} },
+  set calls(v){ localStorage.setItem('ci_calls',JSON.stringify(v)); },
 };
 function bumpStreak(){
   const today=new Date().toISOString().slice(0,10);
@@ -587,21 +602,99 @@ async function answerPresent(choice){
   const v=showVerdict('neutral','Locked in.',
     `This settles at market close, <span class="countdown mono"></span> from now. Come back after 4:00pm ET for the result.`);
   tickClock();
+  askNotifyPermission();
   if(!API.on) return;
   try{
     const tickers=m.variant==='close'?m.tkr:`${m.a.tkr},${m.b.tkr}`;
     const j=await fetch('/api/live?tickers='+tickers).then(r=>r.json());
     let line='';
+    const etDate=new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'});
     if(m.variant==='close'){
       const q=j.results[m.tkr]; if(!q||!q.valid)return;
       const leading=(q.changePct>=0)===(choice==='green');
       line=`${m.tkr} is <span class="${q.changePct>=0?'up':'down'}">${pct(q.changePct)}</span> right now. Your call is ${leading?'ahead':'behind'}.`;
+      saveCall({variant:'close',tkr:m.tkr,name:m.name,choice,date:etDate,prev:{[m.tkr]:q.previousClose}});
     } else {
       const qa=j.results[m.a.tkr],qb=j.results[m.b.tkr]; if(!qa||!qb||!qa.valid||!qb.valid)return;
       const leader=qa.changePct>=qb.changePct?'a':'b';
       line=`${m.a.tkr} <span class="${qa.changePct>=0?'up':'down'}">${pct(qa.changePct)}</span> · ${m.b.tkr} <span class="${qb.changePct>=0?'up':'down'}">${pct(qb.changePct)}</span>. Your call is ${leader===choice?'ahead':'behind'}.`;
+      saveCall({variant:'vs',a:m.a,b:m.b,choice,date:etDate,prev:{[m.a.tkr]:qa.previousClose,[m.b.tkr]:qb.previousClose}});
     }
     v.insertAdjacentHTML('beforeend',`<p class="datum mono">${line}</p>`);
+    scheduleCloseNotification(m);
+  }catch(e){}
+}
+
+/* ---------------- live call persistence + resolution ---------------- */
+function saveCall(c){ const list=store.calls; list.push(c); store.calls=list; }
+
+function askNotifyPermission(){
+  try{
+    if('Notification' in window && Notification.permission==='default') Notification.requestPermission();
+  }catch(e){}
+}
+function scheduleCloseNotification(m){
+  try{
+    if(!('Notification' in window)) return;
+    const ms=msToClose();
+    if(ms<=0||ms>12*3600*1000) return;
+    setTimeout(()=>{
+      if(Notification.permission!=='granted') return;
+      const what=m.variant==='close'?`${m.name} (${m.tkr})`:`${m.a.name} vs ${m.b.name}`;
+      new Notification('Your call just settled',{body:`The market closed. Open Called It to see how your ${what} call did.`});
+    },ms);
+  }catch(e){}
+}
+
+function etNow(){ return new Date(new Date().toLocaleString('en-US',{timeZone:'America/New_York'})); }
+function callResolvable(c){
+  const today=new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'});
+  if(c.date<today) return true;
+  return c.date===today && etNow().getHours()>=16;
+}
+async function checkResolutions(){
+  if(!API.on) return;
+  const pending=store.calls;
+  if(!pending.length) return;
+  const keep=[], resolved=[];
+  for(const c of pending){
+    if(!callResolvable(c)){ keep.push(c); continue; }
+    try{
+      const tickers=c.variant==='close'?c.tkr:`${c.a.tkr},${c.b.tkr}`;
+      const rs={};
+      let ok=true;
+      for(const t of tickers.split(',')){
+        const j=await fetch(`/api/range?ticker=${t}&from=${c.date}&to=${c.date}`).then(r=>r.json());
+        if(!j.endClose){ ok=false; break; }
+        rs[t]=j.endClose;
+      }
+      if(!ok){ keep.push(c); continue; }
+      if(c.variant==='close'){
+        const up=rs[c.tkr]>c.prev[c.tkr];
+        resolved.push({...c, hit:(up===(c.choice==='green')), detail:`${c.tkr} closed ${up?'higher':'lower'} on ${c.date}`});
+      } else {
+        const ra=rs[c.a.tkr]/c.prev[c.a.tkr]-1, rb=rs[c.b.tkr]/c.prev[c.b.tkr]-1;
+        const leader=ra>=rb?'a':'b';
+        const w=leader==='a'?c.a:c.b;
+        resolved.push({...c, hit:leader===c.choice, detail:`${w.name} won the day, ${c.a.tkr} ${pct(ra)} vs ${c.b.tkr} ${pct(rb)}`});
+      }
+    }catch(e){ keep.push(c); }
+  }
+  store.calls=keep;
+  if(!resolved.length) return;
+  const hits=resolved.filter(r=>r.hit).length;
+  const banner=$('#resolveBanner');
+  const first=resolved[0];
+  banner.className='banner show '+(hits===resolved.length?'good':hits===0?'bad':'good');
+  banner.innerHTML=`
+    <p class="bl">${hits===resolved.length?'You called it.':hits===0?'Missed this one.':`You called ${hits} of ${resolved.length}.`}</p>
+    ${resolved.map(r=>`<p class="bb">${r.detail}. ${r.hit?'Your call was right.':'Your call was wrong.'}</p>`).join('')}
+    <p class="bb dismiss"><button class="textbtn" id="bannerDismiss">Dismiss</button></p>`;
+  $('#bannerDismiss').addEventListener('click',()=>banner.classList.remove('show'));
+  try{
+    if('Notification' in window && Notification.permission==='granted'){
+      new Notification(hits===resolved.length?'You called it':'Your call settled',{body:first.detail});
+    }
   }catch(e){}
 }
 
@@ -656,6 +749,7 @@ function renderSummary(){
   const ideas=results.filter(r=>r.type==='future');
   const backed=ideas.filter(t=>t.backed);
   const day=bumpStreak();
+  lastScore={right,total:learn.length,day};
   lastScoreText=`I got ${right}/${learn.length} on today's Called It deck. Five minutes, real prices, plain English. Your turn: `;
   $('#summaryBody').innerHTML=`
     <p class="score serif">${right} of ${learn.length} called right.</p>
@@ -670,12 +764,50 @@ function renderSummary(){
   $('#barFill').style.width='100%';
 }
 
+let lastScore={right:0,total:0,day:1};
+async function makeScoreImage(){
+  try{ await document.fonts.load('400 120px "Instrument Serif"'); await document.fonts.load('600 40px "Instrument Sans"'); }catch(e){}
+  const W=1080,H=1080;
+  const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  const g=cv.getContext('2d');
+  g.fillStyle='#FAF9F6'; g.fillRect(0,0,W,H);
+  g.strokeStyle='#E7E4DD'; g.lineWidth=2; g.strokeRect(48,48,W-96,H-96);
+  g.fillStyle='#C2410C'; g.font='600 34px "Instrument Sans", sans-serif';
+  g.textAlign='center';
+  g.fillText('T O D A Y ’ S   D E C K',W/2,220);
+  g.fillStyle='#161412'; g.font='400 170px "Instrument Serif", serif';
+  g.fillText(`${lastScore.right} of ${lastScore.total}`,W/2,470);
+  g.font='400 64px "Instrument Serif", serif';
+  g.fillText('called right',W/2,570);
+  g.fillStyle='#6B675F'; g.font='500 40px "Instrument Sans", sans-serif';
+  g.fillText(`Day ${lastScore.day} streak`,W/2,700);
+  g.strokeStyle='#E7E4DD'; g.beginPath(); g.moveTo(240,780); g.lineTo(W-240,780); g.stroke();
+  g.fillStyle='#161412'; g.font='400 52px "Instrument Serif", serif';
+  g.fillText('Called It',W/2,860);
+  g.fillStyle='#6B675F'; g.font='500 34px "Instrument Sans", sans-serif';
+  g.fillText('Five minutes a day. Real prices, plain English.',W/2,920);
+  g.fillStyle='#C2410C'; g.font='600 34px "JetBrains Mono", monospace';
+  g.fillText(location.host,W/2,985);
+  return new Promise(res=>cv.toBlob(res,'image/png'));
+}
 async function shareScore(){
   const btn=$('#shareBtn');
   const text=lastScoreText||"Called It: a five minute daily deck that teaches investing with real prices. ";
   const url=location.origin;
+  const blob=await makeScoreImage();
+  if(blob){
+    const file=new File([blob],'called-it-score.png',{type:'image/png'});
+    try{
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({title:'Called It',text:text+url,files:[file]}); return;
+      }
+    }catch(e){ if(e && e.name==='AbortError') return; }
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download='called-it-score.png'; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+  }
   try{ if(navigator.share){ await navigator.share({title:'Called It',text,url}); return; } }catch(e){ return; }
-  try{ await navigator.clipboard.writeText(text+url); btn.textContent='Link copied'; setTimeout(()=>btn.textContent='Challenge a friend',1800); }catch(e){}
+  try{ await navigator.clipboard.writeText(text+url); btn.textContent='Image saved, link copied'; setTimeout(()=>btn.textContent='Challenge a friend',2200); }catch(e){}
 }
 
 /* ---------------- positions ---------------- */
@@ -756,6 +888,7 @@ $('#shareBtn').addEventListener('click',shareScore);
 (async function init(){
   await detectApi();
   tickClock(); setInterval(tickClock,30000);
+  checkResolutions();
 })();
 </script>
 </body>
