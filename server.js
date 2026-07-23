@@ -196,6 +196,59 @@ async function buildMatchup(used) {
   return null;
 }
 
+// ---- private lobbies (in-memory, 24h TTL; a storage layer makes these durable) ----
+const lobbies = new Map(); // code -> { seed, created, scores: [{name,right,total,ts}] }
+const LOBBY_TTL = 24 * 3600 * 1000;
+const CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+
+function purgeLobbies() {
+  const now = Date.now();
+  for (const [code, l] of lobbies) if (now - l.created > LOBBY_TTL) lobbies.delete(code);
+}
+function makeCode() {
+  let c = '';
+  for (let i = 0; i < 5; i++) c += CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)];
+  return lobbies.has(c) ? makeCode() : c;
+}
+function readJson(req) {
+  return new Promise((resolve, reject) => {
+    let d = '';
+    req.on('data', (c) => { d += c; if (d.length > 1e4) req.destroy(); });
+    req.on('end', () => { try { resolve(JSON.parse(d || '{}')); } catch (e) { reject(new Error('bad json')); } });
+    req.on('error', reject);
+  });
+}
+const cleanName = (s) => String(s || '').replace(/[<>&"']/g, '').trim().slice(0, 20) || 'Anonymous';
+
+async function apiLobbyCreate(req, res) {
+  purgeLobbies();
+  const body = await readJson(req).catch(() => ({}));
+  const seed = Number.isInteger(body.seed) ? body.seed : Math.floor(Math.random() * 2 ** 31);
+  const code = makeCode();
+  lobbies.set(code, { seed, created: Date.now(), scores: [] });
+  sendJson(res, 200, { code, seed });
+}
+async function apiLobbySubmit(req, res) {
+  const body = await readJson(req).catch(() => ({}));
+  const code = String(body.code || '').toUpperCase();
+  const l = lobbies.get(code);
+  if (!l) return sendJson(res, 404, { error: 'lobby not found or expired' });
+  const name = cleanName(body.name);
+  const right = Math.max(0, Math.min(20, parseInt(body.right, 10) || 0));
+  const total = Math.max(1, Math.min(20, parseInt(body.total, 10) || 1));
+  const existing = l.scores.findIndex((s) => s.name === name);
+  const entry = { name, right, total, ts: Date.now() };
+  if (existing >= 0) l.scores[existing] = entry; else l.scores.push(entry);
+  sendJson(res, 200, { ok: true, players: l.scores.length });
+}
+function apiLobbyState(params, res) {
+  const code = String(params.get('code') || '').toUpperCase();
+  const l = lobbies.get(code);
+  if (!l) return sendJson(res, 404, { error: 'lobby not found or expired' });
+  const scores = l.scores.slice().sort((a, b) => b.right - a.right || a.ts - b.ts);
+  sendJson(res, 200, { code, seed: l.seed, scores });
+}
+
 // live quotes for present-day calls + future-thesis ticker validation
 async function apiLive(params, res) {
   const tickers = (params.get('tickers') || '').split(',').map((s) => s.trim()).filter(Boolean);
@@ -257,6 +310,9 @@ const server = http.createServer(async (req, res) => {
     if (u.pathname === '/api/position') return await apiPosition(u.searchParams, res);
     if (u.pathname === '/api/matchups') return await apiMatchups(u.searchParams, res);
     if (u.pathname === '/api/live') return await apiLive(u.searchParams, res);
+    if (u.pathname === '/api/lobby/create' && req.method === 'POST') return await apiLobbyCreate(req, res);
+    if (u.pathname === '/api/lobby/submit' && req.method === 'POST') return await apiLobbySubmit(req, res);
+    if (u.pathname === '/api/lobby/state') return apiLobbyState(u.searchParams, res);
     if (u.pathname.startsWith('/api/')) return sendJson(res, 404, { error: 'unknown endpoint' });
     return serveStatic(req, res);
   } catch (e) {
